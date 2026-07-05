@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Village Mill Oils</title>
-  <meta name="description" content="The Village Mill crafts premium cold pressed groundnut, sesame, and coconut oils using traditional chekku methods. Pure. Honest. Unrefined." />
-  <meta name="keywords" content="cold pressed oil, groundnut oil, sesame oil, coconut oil, traditional chekku oil, village mill, organic oil India" />
+  <meta name="description" content="The Village Mill crafts premium wood pressed groundnut, sesame, and coconut oils using traditional chekku methods. Pure. Honest. Unrefined." />
+  <meta name="keywords" content="wood pressed oil, groundnut oil, sesame oil, coconut oil, traditional chekku oil, village mill, organic oil India" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=Poppins:wght@200;300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
@@ -13,123 +13,43 @@
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════════ -->
-  <!--  CURSOR GLOW                              -->
-  <!-- ══════════════════════════════════════════ -->
   <div id="cursor-glow"></div>
   <div id="cursor-dot"></div>
 
-  <!-- ══════════════════════════════════════════ -->
-  <!--  NAVIGATION                               -->
-  <!-- ══════════════════════════════════════════ -->
   <nav id="main-nav">
     <div class="nav-brand">
       <span class="nav-logo-text">The Village Mill</span>
     </div>
     <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#why-cold">Why Cold Pressed</a></li>
       <li><a href="#our-oils">Our Oils</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#why-cold">Why Wood Pressed</a></li>
       <li><a href="#benefits">Benefits</a></li>
       <li><a href="#process">Process</a></li>
-      <li><a href="#coming-soon">Coming Soon</a></li>
+      <li><a href="#order">Order</a></li>
     </ul>
     <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </nav>
 
-  <!-- Mobile Menu -->
   <div id="mobile-menu">
     <ul>
-      <li><a href="#about">About</a></li>
-      <li><a href="#why-cold">Why Cold Pressed</a></li>
       <li><a href="#our-oils">Our Oils</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#why-cold">Why Wood Pressed</a></li>
       <li><a href="#benefits">Benefits</a></li>
       <li><a href="#process">Process</a></li>
-      <li><a href="#coming-soon">Coming Soon</a></li>
+      <li><a href="#order">Order</a></li>
     </ul>
   </div>
 
-  <!-- ══════════════════════════════════════════ -->
-  <!--  HERO SECTION                             -->
-  <!-- ══════════════════════════════════════════ -->
-  <section id="hero">
-    <!-- Ambient background -->
-    <div class="hero-bg">
-      <div class="bg-gradient-layer"></div>
-      <div class="bg-trees">
-        <!-- SVG Coconut Tree Silhouettes -->
-        <svg class="tree tree-left" viewBox="0 0 120 400" xmlns="http://www.w3.org/2000/svg">
-          <line x1="60" y1="400" x2="58" y2="50" stroke="#1a1208" stroke-width="8" stroke-linecap="round"/>
-          <ellipse cx="45" cy="80" rx="40" ry="15" fill="#1a1208" transform="rotate(-30 45 80)"/>
-          <ellipse cx="75" cy="65" rx="38" ry="13" fill="#1c1409" transform="rotate(20 75 65)"/>
-          <ellipse cx="30" cy="100" rx="35" ry="12" fill="#161007" transform="rotate(-50 30 100)"/>
-          <ellipse cx="85" cy="95" rx="33" ry="11" fill="#1a1208" transform="rotate(40 85 95)"/>
-          <ellipse cx="55" cy="55" rx="28" ry="10" fill="#1c1409" transform="rotate(-10 55 55)"/>
-          <circle cx="57" cy="110" r="8" fill="#2a1e0a"/>
-          <circle cx="62" cy="118" r="7" fill="#2a1e0a"/>
-        </svg>
-        <svg class="tree tree-right" viewBox="0 0 120 400" xmlns="http://www.w3.org/2000/svg">
-          <line x1="60" y1="400" x2="62" y2="60" stroke="#1a1208" stroke-width="8" stroke-linecap="round"/>
-          <ellipse cx="75" cy="90" rx="40" ry="15" fill="#1a1208" transform="rotate(30 75 90)"/>
-          <ellipse cx="45" cy="75" rx="38" ry="13" fill="#1c1409" transform="rotate(-20 45 75)"/>
-          <ellipse cx="90" cy="110" rx="35" ry="12" fill="#161007" transform="rotate(50 90 110)"/>
-          <ellipse cx="35" cy="105" rx="33" ry="11" fill="#1a1208" transform="rotate(-40 35 105)"/>
-          <ellipse cx="65" cy="65" rx="28" ry="10" fill="#1c1409" transform="rotate(10 65 65)"/>
-          <circle cx="62" cy="120" r="8" fill="#2a1e0a"/>
-          <circle cx="58" cy="128" r="7" fill="#2a1e0a"/>
-        </svg>
-        <svg class="tree tree-far-left" viewBox="0 0 80 300" xmlns="http://www.w3.org/2000/svg">
-          <line x1="40" y1="300" x2="38" y2="40" stroke="#0e0a04" stroke-width="5"/>
-          <ellipse cx="28" cy="60" rx="28" ry="10" fill="#0e0a04" transform="rotate(-25 28 60)"/>
-          <ellipse cx="52" cy="48" rx="26" ry="9" fill="#0e0a04" transform="rotate(15 52 48)"/>
-          <ellipse cx="20" cy="75" rx="24" ry="8" fill="#0e0a04" transform="rotate(-45 20 75)"/>
-        </svg>
-        <svg class="tree tree-far-right" viewBox="0 0 80 300" xmlns="http://www.w3.org/2000/svg">
-          <line x1="40" y1="300" x2="42" y2="40" stroke="#0e0a04" stroke-width="5"/>
-          <ellipse cx="52" cy="60" rx="28" ry="10" fill="#0e0a04" transform="rotate(25 52 60)"/>
-          <ellipse cx="28" cy="48" rx="26" ry="9" fill="#0e0a04" transform="rotate(-15 28 48)"/>
-          <ellipse cx="60" cy="75" rx="24" ry="8" fill="#0e0a04" transform="rotate(45 60 75)"/>
-        </svg>
-      </div>
-      <div class="bg-fog"></div>
-      <div class="bg-sunrise"></div>
-      <div class="floating-particles" id="particles"></div>
-    </div>
-
-    <!-- ─── HERO HEADLINE ─── -->
-    <div class="hero-headline" id="hero-headline">
-      <div class="headline-eyebrow">Est. From The Soil</div>
-      <h1 class="headline-main">
-        <span class="line1">From Village Roots</span>
-        <em class="line2">to Pure Drops</em>
-      </h1>
-      <p class="headline-sub">Traditional cold pressed oils, crafted the way our ancestors knew — slow, honest, and pure.</p>
-      <div class="headline-cta">
-        <a href="#coming-soon" class="btn-primary">Join the Waitlist</a>
-        <a href="#our-oils" class="btn-ghost">Discover Our Oils</a>
-      </div>
-    </div>
-
-    <!-- Hero scroll hint -->
-    <div class="scroll-hint" id="scroll-hint">
-      <div class="scroll-line"></div>
-      <span>Scroll</span>
-    </div>
-
-  </section>
-
-  <!-- ══════════════════════════════════════════ -->
-  <!--  PRODUCT SHOWCASE SECTION                 -->
-  <!-- ══════════════════════════════════════════ -->
   <section id="our-oils" class="section-oils">
     <div class="section-label-top">Our Craft Oils</div>
     <h2 class="section-title reveal-up">Three Oils.<br/><em>One Ancient Tradition.</em></h2>
-    <p class="section-subtitle reveal-up">Every bottle carries the warmth of a traditional chekku and the purity of single-source seeds.</p>
+    <p class="section-subtitle reveal-up oils-subtitle">Every bottle carries the warmth of a traditional chekku and the purity of single-source seeds.</p>
 
     <div class="oils-showcase">
-      <!-- Left: Sesame Oil -->
       <div class="oil-card oil-sesame reveal-left">
         <div class="oil-bottle-wrap">
           <div class="bottle-glow sesame-glow"></div>
@@ -155,7 +75,7 @@
             <text x="60" y="180" text-anchor="middle" fill="#c9b4e0" font-size="7.5" font-family="Playfair Display" font-weight="bold" letter-spacing="0.5">VILLAGE</text>
             <text x="60" y="192" text-anchor="middle" fill="#c9b4e0" font-size="7.5" font-family="Playfair Display" font-weight="bold" letter-spacing="0.5">MILL</text>
             <line x1="35" y1="197" x2="85" y2="197" stroke="#c9b4e0" stroke-width="0.5"/>
-            <text x="60" y="208" text-anchor="middle" fill="#b09cc8" font-size="5" font-family="Poppins" letter-spacing="1">COLD PRESSED</text>
+            <text x="60" y="208" text-anchor="middle" fill="#b09cc8" font-size="5" font-family="Poppins" letter-spacing="1">WOOD PRESSED</text>
             <text x="60" y="218" text-anchor="middle" fill="#c9b4e0" font-size="5.5" font-family="Playfair Display" font-style="italic">Sesame Oil</text>
             <rect x="37" y="22" width="46" height="14" rx="4" fill="#2a1a3a"/>
             <rect x="42" y="17" width="36" height="18" rx="3" fill="#1a0f28"/>
@@ -169,7 +89,6 @@
         </div>
       </div>
 
-      <!-- Center: Groundnut Oil (HERO) -->
       <div class="oil-card oil-groundnut oil-hero reveal-up">
         <div class="hero-product-spotlight">
           <div class="spotlight-ring"></div>
@@ -203,7 +122,7 @@
               <text x="60" y="179" text-anchor="middle" fill="#c9a84c" font-size="8" font-family="Playfair Display" font-weight="bold" letter-spacing="0.5">VILLAGE</text>
               <text x="60" y="192" text-anchor="middle" fill="#c9a84c" font-size="8" font-family="Playfair Display" font-weight="bold" letter-spacing="0.5">MILL</text>
               <line x1="35" y1="197" x2="85" y2="197" stroke="#c9a84c" stroke-width="0.6"/>
-              <text x="60" y="208" text-anchor="middle" fill="#d4b896" font-size="5" font-family="Poppins" letter-spacing="1.5">COLD PRESSED</text>
+              <text x="60" y="208" text-anchor="middle" fill="#d4b896" font-size="5" font-family="Poppins" letter-spacing="1.5">WOOD PRESSED</text>
               <text x="60" y="220" text-anchor="middle" fill="#d4b896" font-size="5.5" font-family="Playfair Display" font-style="italic">Groundnut Oil</text>
               <rect x="37" y="22" width="46" height="14" rx="4" fill="#5c3510"/>
               <rect x="42" y="17" width="36" height="18" rx="3" fill="#4a2a0a"/>
@@ -214,12 +133,19 @@
         <div class="oil-info oil-info-hero">
           <span class="flagship-badge">Flagship</span>
           <h3>Groundnut Oil</h3>
-          <p>Our heart and soul. Single-origin peanuts, cold pressed in a traditional wooden chekku for the purest, most nutritious oil possible.</p>
-          <span class="coming-soon-tag pulse-tag">Coming Soon</span>
+          <p>Our heart and soul. Single-origin peanuts, wood pressed in a traditional wooden chekku for the purest, most nutritious oil possible.</p>
+          <a
+            class="btn-primary order-now-btn js-whatsapp-link"
+            href="https://wa.me/c/917871247010"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open WhatsApp catalog to order Groundnut Oil"
+          >
+            <span>Order Now</span>
+          </a>
         </div>
       </div>
 
-      <!-- Right: Coconut Oil -->
       <div class="oil-card oil-coconut reveal-right">
         <div class="oil-bottle-wrap">
           <div class="bottle-glow coconut-glow"></div>
@@ -245,7 +171,7 @@
             <text x="60" y="180" text-anchor="middle" fill="#4a3010" font-size="7.5" font-family="Playfair Display" font-weight="bold" letter-spacing="0.5">VILLAGE</text>
             <text x="60" y="192" text-anchor="middle" fill="#4a3010" font-size="7.5" font-family="Playfair Display" font-weight="bold" letter-spacing="0.5">MILL</text>
             <line x1="35" y1="197" x2="85" y2="197" stroke="#c9a84c" stroke-width="0.5"/>
-            <text x="60" y="208" text-anchor="middle" fill="#6b4e20" font-size="5" font-family="Poppins" letter-spacing="1">COLD PRESSED</text>
+            <text x="60" y="208" text-anchor="middle" fill="#6b4e20" font-size="5" font-family="Poppins" letter-spacing="1">WOOD PRESSED</text>
             <text x="60" y="218" text-anchor="middle" fill="#4a3010" font-size="5.5" font-family="Playfair Display" font-style="italic">Coconut Oil</text>
             <rect x="37" y="22" width="46" height="14" rx="4" fill="#4a3010"/>
             <rect x="42" y="17" width="36" height="18" rx="3" fill="#3a2208"/>
@@ -254,7 +180,7 @@
         </div>
         <div class="oil-info">
           <h3>Coconut Oil</h3>
-          <p>Hand-harvested coconuts from coastal groves, cold pressed to preserve every drop of natural goodness.</p>
+          <p>Hand-harvested coconuts from coastal groves, wood pressed to preserve every drop of natural goodness.</p>
           <span class="coming-soon-tag">Coming Soon</span>
         </div>
       </div>
@@ -325,7 +251,7 @@
         <div class="about-stats">
           <div class="stat">
             <span class="stat-num">100%</span>
-            <span class="stat-label">Cold Pressed</span>
+            <span class="stat-label">Wood Pressed</span>
           </div>
           <div class="stat">
             <span class="stat-num">0</span>
@@ -345,13 +271,13 @@
   <!-- ══════════════════════════════════════════ -->
   <section id="why-cold" class="section-why">
     <div class="section-label-top">The Difference</div>
-    <h2 class="section-title reveal-up">Why <em>Cold Pressed</em>?</h2>
+    <h2 class="section-title reveal-up">Why <em>Wood Pressed</em>?</h2>
     <p class="section-subtitle reveal-up">Modern refining strips oils of everything that makes them alive. We don't do that.</p>
 
     <div class="comparison-grid">
       <div class="comparison-card cold-card reveal-left">
         <div class="card-icon">🌿</div>
-        <h3>Cold Pressed (Our Way)</h3>
+        <h3>Wood Pressed (Our Way)</h3>
         <ul>
           <li>✦ Pressed below 40°C — nutrients intact</li>
           <li>✦ Natural colour, aroma, flavour preserved</li>
@@ -536,31 +462,29 @@
     </div>
   </section>
 
-  <!-- ══════════════════════════════════════════ -->
-  <!--  COMING SOON SECTION                      -->
-  <!-- ══════════════════════════════════════════ -->
-  <section id="coming-soon" class="section-coming-soon">
+  <section id="order" class="section-coming-soon">
     <div class="coming-bg-gradient"></div>
     <div class="coming-content">
-      <div class="coming-label reveal-up">The Wait Is Almost Over</div>
-      <h2 class="coming-title reveal-up">Pure Oil.<br/><em>Honest Tradition.</em><br/>Coming Soon.</h2>
-      <p class="coming-sub reveal-up">Be the first to taste the difference. Join our founding circle and receive early access, exclusive pricing, and a handwritten note from our press-master.</p>
+      <div class="coming-label reveal-up">Order Directly</div>
+      <h2 class="coming-title reveal-up">Freshly Pressed Oils<br/><em>Ready to Reach You.</em></h2>
+      <p class="coming-sub reveal-up">Browse our WhatsApp catalog, check availability quickly, and place your order in the easiest way from your phone.</p>
 
-      <div class="email-form reveal-up">
-        <div class="form-inner">
-          <input type="email" id="email-input" placeholder="your@email.com" />
-          <button class="btn-submit" id="submit-btn">Notify Me</button>
-        </div>
-        <p class="form-note">We respect your inbox. No spam, ever.</p>
-        <div class="form-success hidden" id="form-success">
-          <span>✦</span> Thank you! You're on the founding list.
-        </div>
+      <div class="order-cta-wrap reveal-up">
+        <a
+          class="btn-primary order-section-btn js-whatsapp-link"
+          href="https://wa.me/c/917871247010"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open WhatsApp catalog"
+        >
+          <span>Open WhatsApp Catalog</span>
+        </a>
       </div>
 
       <div class="coming-extras reveal-up">
-        <div class="extra-tag">🌿 Free shipping on first order</div>
-        <div class="extra-tag">🏺 Founding member pricing</div>
-        <div class="extra-tag">📦 Premium packaging</div>
+        <div class="extra-tag">🌿 Easy mobile ordering</div>
+        <div class="extra-tag">🏺 Direct catalog access</div>
+        <div class="extra-tag">📦 Quick order confirmation</div>
       </div>
     </div>
   </section>
@@ -588,21 +512,22 @@
             <li><a href="#our-oils">Our Oils</a></li>
             <li><a href="#process">Process</a></li>
             <li><a href="#benefits">Benefits</a></li>
+            <li><a href="#order">Order</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h5>Connect</h5>
           <ul>
             <li><a href="https://www.instagram.com/village.mill?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank">Instagram</a></li>
-            <li><a href="#">Facebook</a></li>
+            <li><a href="https://www.facebook.com/profile.php?id=61591182017183" target="_blank">Facebook</a></li>
             <li><a href="https://youtube.com/@villagemill?si=rRhB-Zr8rrb8setH" target="_blank">YouTube</a></li>
-            <li><a href="#">WhatsApp</a></li>
+            <li><a href="https://wa.me/c/917871247010" target="_blank" rel="noopener noreferrer" class="js-whatsapp-link">WhatsApp</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h5>Contact</h5>
           <ul>
-            <li><a href="mailto:hello@thevillagmill.com">hello@thevillagemill.com</a></li>
+            <li><a href="mailto:villagemill.official@gmail.com">villagemill.official@gmail.com</a></li>
             <li><span>Tamil Nadu, India</span></li>
           </ul>
         </div>
@@ -612,13 +537,13 @@
         <a href="https://www.instagram.com/village.mill?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="social-icon" aria-label="Instagram">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
         </a>
-        <a href="#" class="social-icon" aria-label="Facebook">
+        <a href="https://www.facebook.com/profile.php?id=61591182017183" target="_blank" class="social-icon" aria-label="Facebook">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
         </a>
         <a href="https://youtube.com/@villagemill?si=rRhB-Zr8rrb8setH" target="_blank" class="social-icon" aria-label="YouTube">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.97C5.12 20 12 20 12 20s6.88 0 8.59-.45a2.78 2.78 0 001.95-1.97A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg>
         </a>
-        <a href="#" class="social-icon" aria-label="WhatsApp">
+        <a href="https://wa.me/c/917871247010" target="_blank" rel="noopener noreferrer" class="social-icon js-whatsapp-link" aria-label="WhatsApp">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
         </a>
       </div>

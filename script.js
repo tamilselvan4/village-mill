@@ -13,11 +13,18 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const lerp = (a, b, t) => a + (b - a) * t;
 
 const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J2jFVT_xfaAGj-xF61HMqmaMwHc4UOZiTIXwKkN5Uj2WDSb838_eIeyhg/exec';
+const WHATSAPP_CATALOG_URL = 'https://wa.me/c/917871247010';
+const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+const isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
+const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const shouldUseLiteEffects = isTouchDevice || isMobileViewport || shouldReduceMotion;
 
 /* ═══════════════════════════════════════════════════════════
    1. CUSTOM CURSOR
    ═══════════════════════════════════════════════════════════ */
 (function initCursor() {
+  if (isTouchDevice) return;
+
   const glow = $('#cursor-glow');
   const dot  = $('#cursor-dot');
   if (!glow || !dot) return;
@@ -64,7 +71,7 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
   const container = $('#particles');
   if (!container) return;
 
-  const count = 28;
+  const count = shouldUseLiteEffects ? 10 : 28;
   for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
@@ -133,6 +140,15 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 (function initScrollReveal() {
   const targets = $$('.reveal-up, .reveal-left, .reveal-right, .section-label-top, .section-subtitle');
 
+  if (shouldUseLiteEffects) {
+    targets.forEach(el => {
+      el.classList.add('revealed');
+      el.style.opacity = '';
+      el.style.transform = '';
+    });
+    return;
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -172,6 +188,8 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
    5. PARALLAX EFFECTS
    ═══════════════════════════════════════════════════════════ */
 (function initParallax() {
+  if (shouldUseLiteEffects) return;
+
   const trees  = $$('.tree');
   const sunrise = $('.bg-sunrise');
 
@@ -307,6 +325,8 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
    8. OIL BOTTLE 3D HOVER (subtle tilt)
    ═══════════════════════════════════════════════════════════ */
 (function initBottleTilt() {
+  if (shouldUseLiteEffects) return;
+
   $$('.oil-card').forEach(card => {
     card.addEventListener('mousemove', e => {
       const rect  = card.getBoundingClientRect();
@@ -345,6 +365,8 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
    10. DYNAMIC OIL SHIMMER on scroll
    ═══════════════════════════════════════════════════════════ */
 (function initOilShimmer() {
+  if (shouldUseLiteEffects) return;
+
   const bottles = $$('.product-bottle');
   let scrollY = 0;
 
@@ -362,6 +384,24 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
   }
 
   shimmerFrame();
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   11B. WHATSAPP CATALOG LINKS
+   ═══════════════════════════════════════════════════════════ */
+(function initWhatsAppLinks() {
+  $$('.js-whatsapp-link').forEach(link => {
+    link.setAttribute('href', WHATSAPP_CATALOG_URL);
+  });
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   11C. LIGHTWEIGHT MOBILE SVG
+   ═══════════════════════════════════════════════════════════ */
+(function simplifyMobileAnimations() {
+  if (!shouldUseLiteEffects) return;
+
+  $$('animateTransform').forEach(node => node.remove());
 })();
 
 /* ═══════════════════════════════════════════════════════════

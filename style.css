@@ -488,7 +488,13 @@ section {
 .section-oils {
   background: linear-gradient(180deg, var(--brown-deep) 0%, #120a02 40%, var(--brown-deep) 100%);
   text-align: center;
-  padding: 8rem 2rem;
+  padding: 9.5rem 2rem 8rem;
+}
+
+.oils-subtitle {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .oils-showcase {
@@ -615,6 +621,12 @@ section {
 
 .oil-info-hero h3 { font-size: 1.8rem; }
 .oil-info-hero p { max-width: 280px; }
+
+.order-now-btn {
+  min-width: 180px;
+  justify-content: center;
+  margin-top: 0.35rem;
+}
 
 .flagship-badge {
   display: inline-block;
@@ -1012,6 +1024,17 @@ section {
   margin-bottom: 3rem;
 }
 
+.order-cta-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.order-section-btn {
+  min-width: 260px;
+  justify-content: center;
+}
+
 .email-form { margin-bottom: 2.5rem; }
 
 .form-inner {
@@ -1235,12 +1258,39 @@ section {
 
   section { padding: 5rem 1.5rem; }
 
+  .section-oils {
+    padding-top: 7.5rem;
+    padding-bottom: 5rem;
+  }
+
   .oils-showcase {
     grid-template-columns: 1fr;
-    max-width: 360px;
+    max-width: 100%;
+    gap: 1.25rem;
   }
 
   .oil-groundnut { order: -1; }
+
+  .oil-card {
+    padding: 1.5rem 1.1rem;
+    gap: 1rem;
+  }
+
+  .oil-info p {
+    max-width: 100%;
+  }
+
+  .order-now-btn,
+  .order-section-btn {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .spotlight-ring,
+  .bottle-float-wrap,
+  .coming-bg-gradient {
+    animation: none;
+  }
 
   .about-grid {
     grid-template-columns: 1fr;
@@ -1256,13 +1306,28 @@ section {
   .process-step {
     grid-template-columns: auto 1fr;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
+    align-items: start;
   }
 
   .process-step:not(.step-right) .step-content,
   .step-right .step-content { grid-column: 2; text-align: left; }
   .step-number { display: none; }
   .step-right .step-content { grid-column: 2; }
+
+  .step-icon-wrap svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .step-content {
+    padding: 1.1rem 1rem;
+  }
+
+  .step-content p {
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
 
   .footer-inner {
     grid-template-columns: 1fr;
@@ -1272,10 +1337,6 @@ section {
 
   .footer-links { grid-template-columns: repeat(3, 1fr); }
   .footer-social { flex-direction: row; justify-content: center; }
-
-  .headline-cta { flex-direction: column; align-items: center; }
-
-  .scroll-hint { display: none; }
 
   .comparison-grid { gap: 1rem; }
 
@@ -1287,4 +1348,13 @@ section {
   .btn-submit { width: 100%; text-align: center; }
   .footer-links { grid-template-columns: 1fr 1fr; }
   .about-stats { grid-template-columns: 1fr; gap: 1rem; }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .section-subtitle,
+  .coming-sub {
+    font-size: 1rem;
+  }
 }
