@@ -32,7 +32,7 @@
       <li><a href="#our-oils">Our Oils</a></li>
       <li><a href="#benefits">Benefits</a></li>
       <li><a href="#process">Process</a></li>
-      <li><a href="#coming-soon">Coming Soon</a></li>
+      <li><button type="button" class="nav-order-trigger" data-open-order-modal>Order Now</button></li>
     </ul>
     <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -47,78 +47,9 @@
       <li><a href="#our-oils">Our Oils</a></li>
       <li><a href="#benefits">Benefits</a></li>
       <li><a href="#process">Process</a></li>
-      <li><a href="#coming-soon">Coming Soon</a></li>
+      <li><button type="button" class="mobile-order-trigger" data-open-order-modal>Order Now</button></li>
     </ul>
   </div>
-
-  <!-- ══════════════════════════════════════════ -->
-  <!--  HERO SECTION                             -->
-  <!-- ══════════════════════════════════════════ -->
-  <section id="hero">
-    <!-- Ambient background -->
-    <div class="hero-bg">
-      <div class="bg-gradient-layer"></div>
-      <div class="bg-trees">
-        <!-- SVG Coconut Tree Silhouettes -->
-        <svg class="tree tree-left" viewBox="0 0 120 400" xmlns="http://www.w3.org/2000/svg">
-          <line x1="60" y1="400" x2="58" y2="50" stroke="#1a1208" stroke-width="8" stroke-linecap="round"/>
-          <ellipse cx="45" cy="80" rx="40" ry="15" fill="#1a1208" transform="rotate(-30 45 80)"/>
-          <ellipse cx="75" cy="65" rx="38" ry="13" fill="#1c1409" transform="rotate(20 75 65)"/>
-          <ellipse cx="30" cy="100" rx="35" ry="12" fill="#161007" transform="rotate(-50 30 100)"/>
-          <ellipse cx="85" cy="95" rx="33" ry="11" fill="#1a1208" transform="rotate(40 85 95)"/>
-          <ellipse cx="55" cy="55" rx="28" ry="10" fill="#1c1409" transform="rotate(-10 55 55)"/>
-          <circle cx="57" cy="110" r="8" fill="#2a1e0a"/>
-          <circle cx="62" cy="118" r="7" fill="#2a1e0a"/>
-        </svg>
-        <svg class="tree tree-right" viewBox="0 0 120 400" xmlns="http://www.w3.org/2000/svg">
-          <line x1="60" y1="400" x2="62" y2="60" stroke="#1a1208" stroke-width="8" stroke-linecap="round"/>
-          <ellipse cx="75" cy="90" rx="40" ry="15" fill="#1a1208" transform="rotate(30 75 90)"/>
-          <ellipse cx="45" cy="75" rx="38" ry="13" fill="#1c1409" transform="rotate(-20 45 75)"/>
-          <ellipse cx="90" cy="110" rx="35" ry="12" fill="#161007" transform="rotate(50 90 110)"/>
-          <ellipse cx="35" cy="105" rx="33" ry="11" fill="#1a1208" transform="rotate(-40 35 105)"/>
-          <ellipse cx="65" cy="65" rx="28" ry="10" fill="#1c1409" transform="rotate(10 65 65)"/>
-          <circle cx="62" cy="120" r="8" fill="#2a1e0a"/>
-          <circle cx="58" cy="128" r="7" fill="#2a1e0a"/>
-        </svg>
-        <svg class="tree tree-far-left" viewBox="0 0 80 300" xmlns="http://www.w3.org/2000/svg">
-          <line x1="40" y1="300" x2="38" y2="40" stroke="#0e0a04" stroke-width="5"/>
-          <ellipse cx="28" cy="60" rx="28" ry="10" fill="#0e0a04" transform="rotate(-25 28 60)"/>
-          <ellipse cx="52" cy="48" rx="26" ry="9" fill="#0e0a04" transform="rotate(15 52 48)"/>
-          <ellipse cx="20" cy="75" rx="24" ry="8" fill="#0e0a04" transform="rotate(-45 20 75)"/>
-        </svg>
-        <svg class="tree tree-far-right" viewBox="0 0 80 300" xmlns="http://www.w3.org/2000/svg">
-          <line x1="40" y1="300" x2="42" y2="40" stroke="#0e0a04" stroke-width="5"/>
-          <ellipse cx="52" cy="60" rx="28" ry="10" fill="#0e0a04" transform="rotate(25 52 60)"/>
-          <ellipse cx="28" cy="48" rx="26" ry="9" fill="#0e0a04" transform="rotate(-15 28 48)"/>
-          <ellipse cx="60" cy="75" rx="24" ry="8" fill="#0e0a04" transform="rotate(45 60 75)"/>
-        </svg>
-      </div>
-      <div class="bg-fog"></div>
-      <div class="bg-sunrise"></div>
-      <div class="floating-particles" id="particles"></div>
-    </div>
-
-    <!-- ─── HERO HEADLINE ─── -->
-    <div class="hero-headline" id="hero-headline">
-      <div class="headline-eyebrow">Est. From The Soil</div>
-      <h1 class="headline-main">
-        <span class="line1">From Village Roots</span>
-        <em class="line2">to Pure Drops</em>
-      </h1>
-      <p class="headline-sub">Traditional cold pressed oils, crafted the way our ancestors knew — slow, honest, and pure.</p>
-      <div class="headline-cta">
-        <a href="#coming-soon" class="btn-primary">Join the Waitlist</a>
-        <a href="#our-oils" class="btn-ghost">Discover Our Oils</a>
-      </div>
-    </div>
-
-    <!-- Hero scroll hint -->
-    <div class="scroll-hint" id="scroll-hint">
-      <div class="scroll-line"></div>
-      <span>Scroll</span>
-    </div>
-
-  </section>
 
   <!-- ══════════════════════════════════════════ -->
   <!--  PRODUCT SHOWCASE SECTION                 -->
@@ -126,7 +57,7 @@
   <section id="our-oils" class="section-oils">
     <div class="section-label-top">Our Craft Oils</div>
     <h2 class="section-title reveal-up">Three Oils.<br/><em>One Ancient Tradition.</em></h2>
-    <p class="section-subtitle reveal-up">Every bottle carries the warmth of a traditional chekku and the purity of single-source seeds.</p>
+    <p class="section-subtitle section-subtitle-center reveal-up">Every bottle carries the warmth of a traditional chekku and the purity of single-source seeds.</p>
 
     <div class="oils-showcase">
       <!-- Left: Sesame Oil -->
@@ -215,7 +146,14 @@
           <span class="flagship-badge">Flagship</span>
           <h3>Groundnut Oil</h3>
           <p>Our heart and soul. Single-origin peanuts, cold pressed in a traditional wooden chekku for the purest, most nutritious oil possible.</p>
-          <span class="coming-soon-tag pulse-tag">Coming Soon</span>
+          <button
+            type="button"
+            class="btn-primary order-now-btn"
+            data-open-order-modal
+            data-product="Groundnut Oil"
+          >
+            <span>Order Now</span>
+          </button>
         </div>
       </div>
 
@@ -542,9 +480,15 @@
   <section id="coming-soon" class="section-coming-soon">
     <div class="coming-bg-gradient"></div>
     <div class="coming-content">
-      <div class="coming-label reveal-up">The Wait Is Almost Over</div>
-      <h2 class="coming-title reveal-up">Pure Oil.<br/><em>Honest Tradition.</em><br/>Coming Soon.</h2>
+      <div class="coming-label reveal-up">Fresh From The Mill</div>
+      <h2 class="coming-title reveal-up">Pure Oil.<br/><em>Honest Tradition.</em></h2>
       <p class="coming-sub reveal-up">Be the first to taste the difference. Join our founding circle and receive early access, exclusive pricing, and a handwritten note from our press-master.</p>
+
+      <div class="coming-actions reveal-up">
+        <button type="button" class="btn-primary coming-order-btn" data-open-order-modal>
+          <span>Order Now</span>
+        </button>
+      </div>
 
       <div class="email-form reveal-up">
         <div class="form-inner">
@@ -564,6 +508,144 @@
       </div>
     </div>
   </section>
+
+  <div class="modal-backdrop hidden" id="order-modal-backdrop" aria-hidden="true">
+    <div
+      class="order-modal"
+      id="order-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="order-modal-title"
+    >
+      <div class="order-modal-header">
+        <div>
+          <div class="order-modal-eyebrow">Quick Order</div>
+          <h3 id="order-modal-title">Groundnut Oil</h3>
+        </div>
+        <button type="button" class="order-modal-close" id="order-modal-close" aria-label="Close order form">×</button>
+      </div>
+
+      <form class="order-form" id="order-form">
+        <div class="order-form-scroll">
+          <div class="order-section-card order-size-list" aria-label="Select quantities">
+            <div class="size-row" data-size-row="1000ml">
+              <div class="size-row-copy">
+                <span class="size-row-title">1000ml</span>
+                <span class="size-row-price">Rs. 420 each</span>
+              </div>
+              <div class="quantity-control quantity-control-compact" data-size-control="1000ml">
+                <button type="button" class="qty-btn" data-qty-action="decrease" data-size="1000ml" aria-label="Decrease 1000ml quantity">-</button>
+                <input
+                  id="order-qty-1000"
+                  name="quantity1000"
+                  type="number"
+                  min="0"
+                  max="20"
+                  value="1"
+                  inputmode="numeric"
+                  aria-label="1000ml quantity"
+                />
+                <button type="button" class="qty-btn" data-qty-action="increase" data-size="1000ml" aria-label="Increase 1000ml quantity">+</button>
+              </div>
+            </div>
+
+            <div class="size-row" data-size-row="500ml">
+              <div class="size-row-copy">
+                <span class="size-row-title">500ml</span>
+                <span class="size-row-price">Rs. 210 each</span>
+              </div>
+              <div class="quantity-control quantity-control-compact" data-size-control="500ml">
+                <button type="button" class="qty-btn" data-qty-action="decrease" data-size="500ml" aria-label="Decrease 500ml quantity">-</button>
+                <input
+                  id="order-qty-500"
+                  name="quantity500"
+                  type="number"
+                  min="0"
+                  max="20"
+                  value="0"
+                  inputmode="numeric"
+                  aria-label="500ml quantity"
+                />
+                <button type="button" class="qty-btn" data-qty-action="increase" data-size="500ml" aria-label="Increase 500ml quantity">+</button>
+              </div>
+            </div>
+
+            <p class="order-size-helper">Choose one or both sizes. You can adjust quantities anytime before payment.</p>
+          </div>
+
+          <div class="delivery-choice-row">
+              <label class="choice-chip">
+                <input type="radio" name="delivery" value="pickup" checked />
+                <span>pickup</span>
+              </label>
+              <label class="choice-chip">
+                <input type="radio" name="delivery" value="home" />
+                <span>Home delivery</span>
+              </label>
+          </div>
+
+          <div class="order-input-grid">
+            <div class="order-field-group">
+              <input id="customer-name" name="customerName" type="text" autocomplete="name" maxlength="60" placeholder="Name" required />
+            </div>
+            <div class="order-field-group">
+              <input id="phone-number" name="phoneNumber" type="tel" autocomplete="tel" inputmode="tel" maxlength="15" placeholder="Mobile No." required />
+            </div>
+          </div>
+
+          <div class="order-field-group" id="address-group">
+            <textarea id="customer-address" name="address" rows="3" autocomplete="street-address" placeholder="Address" required></textarea>
+          </div>
+
+          <div class="order-field-group order-pincode-group">
+            <input id="customer-pincode" name="pincode" type="text" autocomplete="postal-code" inputmode="numeric" maxlength="10" placeholder="pincode" required />
+          </div>
+
+          <div class="payment-panel hidden" id="payment-panel">
+            <p class="payment-copy" id="payment-copy"></p>
+            <div class="payment-qr-wrap" id="payment-qr-wrap">
+              <img id="payment-qr-image" alt="UPI payment QR code" />
+            </div>
+            <a class="btn-primary payment-link hidden" id="upi-pay-link" href="#" target="_self" rel="noopener">
+              <span>Open UPI App</span>
+            </a>
+            <label class="payment-confirm">
+              <input type="checkbox" id="payment-confirmed" />
+              <span>I have completed the payment</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="summary-pay-row">
+          <div class="order-summary-compact" id="order-summary-compact">
+            <button type="button" class="summary-toggle" id="summary-toggle-btn" aria-expanded="false" aria-controls="order-summary">
+              <span class="summary-toggle-topline">
+                <span class="summary-toggle-label">Order total</span>
+                <span class="summary-caret" id="summary-caret" aria-hidden="true">+</span>
+              </span>
+              <strong class="summary-compact-total" id="summary-compact-total"></strong>
+              <span class="summary-toggle-hint" id="summary-toggle-hint">Tap to review order details</span>
+            </button>
+            <div class="order-summary hidden" id="order-summary">
+              <div class="summary-line summary-line-stack" id="summary-size-qty"></div>
+              <div class="summary-line" id="summary-subtotal"></div>
+              <div class="summary-line" id="summary-delivery"></div>
+              <div class="summary-line summary-total" id="summary-total"></div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary modal-submit-btn" id="order-submit-btn">
+            <span class="modal-submit-copy">
+              <span class="modal-submit-title" id="order-submit-title">Pay Now</span>
+              <span class="modal-submit-note" id="order-submit-note">Generate secure UPI payment</span>
+            </span>
+          </button>
+        </div>
+
+        <p class="order-status hidden" id="order-status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
 
   <!-- ══════════════════════════════════════════ -->
   <!--  FOOTER                                   -->

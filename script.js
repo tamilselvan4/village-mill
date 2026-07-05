@@ -13,6 +13,17 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const lerp = (a, b, t) => a + (b - a) * t;
 
 const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J2jFVT_xfaAGj-xF61HMqmaMwHc4UOZiTIXwKkN5Uj2WDSb838_eIeyhg/exec';
+const ORDER_PRICING = {
+  '500ml': 210,
+  '1000ml': 420,
+};
+const DELIVERY_FEE = 45;
+const ORDER_PRODUCT = 'Groundnut Oil';
+const UPI_CONFIG = {
+  payeeName: 'The Village Mill',
+  payeeVpa: 'village.mill@axl',
+  merchantCode: '',
+};
 
 /* ═══════════════════════════════════════════════════════════
    1. CUSTOM CURSOR
@@ -288,7 +299,464 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   7. SMOOTH SECTION TRANSITIONS (section bg glow)
+   7. GROUNDNUT ORDER MODAL
+   ═══════════════════════════════════════════════════════════ */
+(function initOrderModal() {
+  const openButtons = $$('[data-open-order-modal]');
+  const backdrop = $('#order-modal-backdrop');
+  const closeBtn = $('#order-modal-close');
+  const form = $('#order-form');
+  const sizeInputs = {
+    '1000ml': $('#order-qty-1000'),
+    '500ml': $('#order-qty-500'),
+  };
+  const qtyButtons = $$('[data-qty-action]', form);
+  const addressGroup = $('#address-group');
+  const pincodeGroup = $('#customer-pincode')?.closest('.order-field-group');
+  const paymentPanel = $('#payment-panel');
+  const paymentCopy = $('#payment-copy');
+  const paymentLink = $('#upi-pay-link');
+  const paymentQrWrap = $('#payment-qr-wrap');
+  const paymentQrImage = $('#payment-qr-image');
+  const paymentConfirmed = $('#payment-confirmed');
+  const submitBtn = $('#order-submit-btn');
+  const submitTitle = $('#order-submit-title');
+  const submitNote = $('#order-submit-note');
+  const summaryToggleBtn = $('#summary-toggle-btn');
+  const summaryCompactTotal = $('#summary-compact-total');
+  const summaryToggleHint = $('#summary-toggle-hint');
+  const summaryPanel = $('#order-summary');
+  const status = $('#order-status');
+  const summarySizeQty = $('#summary-size-qty');
+  const summarySubtotal = $('#summary-subtotal');
+  const summaryDelivery = $('#summary-delivery');
+  const summaryTotal = $('#summary-total');
+  if (!openButtons.length || !backdrop || !form) return;
+
+  const sizeOrder = ['1000ml', '500ml'];
+
+  let paymentStepActive = false;
+  let summaryExpanded = false;
+  let latestOrderSnapshot = null;
+
+  function setSubmitState(title, note) {
+    if (submitTitle) submitTitle.textContent = title;
+    if (submitNote) submitNote.textContent = note;
+  }
+
+  function isPlaceholderVpa() {
+    return !UPI_CONFIG.payeeVpa || /villagemill@upi/i.test(UPI_CONFIG.payeeVpa);
+  }
+
+  function isCompactOrderLayout() {
+    return window.matchMedia('(max-width: 480px)').matches;
+  }
+
+  function setStatus(message = '', type = '') {
+    status.textContent = message;
+    status.className = 'order-status';
+    if (!message) {
+      status.classList.add('hidden');
+      return;
+    }
+    status.classList.remove('hidden');
+    if (type) status.classList.add(type);
+  }
+
+  function getSelectedValue(name) {
+    return $(`input[name="${name}"]:checked`, form)?.value;
+  }
+
+  function getSizeQuantity(size) {
+    const input = sizeInputs[size];
+    const parsed = Number.parseInt(input?.value || '0', 10);
+    return Math.min(20, Math.max(0, Number.isNaN(parsed) ? 0 : parsed));
+  }
+
+  function setSizeQuantity(size, value) {
+    const input = sizeInputs[size];
+    if (!input) return;
+    input.value = String(Math.min(20, Math.max(0, value)));
+  }
+
+  function formatCurrency(amount) {
+    return `₹${amount}`;
+  }
+
+  function getSelectedItems() {
+    return sizeOrder
+      .map(size => {
+        const quantity = getSizeQuantity(size);
+        return {
+          size,
+          quantity,
+          unitPrice: ORDER_PRICING[size] || 0,
+          subtotal: (ORDER_PRICING[size] || 0) * quantity,
+        };
+      })
+      .filter(item => item.quantity > 0);
+  }
+
+  function buildItemsSummary(items) {
+    return items.map(item => `${item.size} × ${item.quantity}`).join(', ');
+  }
+
+  function buildPaymentDescription(items) {
+    return items.map(item => `${item.size} × ${item.quantity}`).join(' + ');
+  }
+
+  function buildOrderState() {
+    const items = getSelectedItems();
+    const quantity = items.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
+    const deliveryMode = getSelectedValue('delivery') || 'pickup';
+    const deliveryFee = deliveryMode === 'home' ? DELIVERY_FEE : 0;
+    const total = subtotal + deliveryFee;
+    const size = items.length ? buildItemsSummary(items) : 'No size selected';
+    const effectiveUnitPrice = quantity > 0 ? Math.round(subtotal / quantity) : 0;
+
+    return {
+      product: ORDER_PRODUCT,
+      items,
+      size,
+      quantity,
+      unitPrice: effectiveUnitPrice,
+      subtotal,
+      deliveryMode,
+      deliveryFee,
+      total,
+    };
+  }
+
+  function updateSummary() {
+    const state = buildOrderState();
+
+    if (state.items.length) {
+      summarySizeQty.innerHTML = state.items
+        .map(item => `<span>${item.size} × ${item.quantity}</span><strong>${formatCurrency(item.subtotal)}</strong>`)
+        .join('');
+    } else {
+      summarySizeQty.innerHTML = '<span>No size selected yet</span><strong>Rs. 0</strong>';
+    }
+
+    summarySubtotal.textContent = `Subtotal = ${formatCurrency(state.subtotal)}`;
+    summaryDelivery.textContent = state.deliveryMode === 'home'
+      ? `Home delivery = ${formatCurrency(state.deliveryFee)}`
+      : 'Pickup = Free';
+    summaryTotal.textContent = `Total = ${formatCurrency(state.total)}`;
+    summaryCompactTotal.textContent = `Rs. ${state.total}`;
+
+    if (summaryToggleHint) {
+      summaryToggleHint.textContent = summaryExpanded
+        ? 'Order details are shown below'
+        : 'Tap to review order details';
+    }
+
+    if (paymentStepActive) {
+      refreshPaymentUi();
+    }
+  }
+
+  function updateDeliveryFields() {
+    const deliveryMode = getSelectedValue('delivery') || 'pickup';
+    const showDeliveryFields = deliveryMode === 'home';
+
+    addressGroup?.classList.toggle('delivery-dependent', true);
+    pincodeGroup?.classList.toggle('delivery-dependent', true);
+    addressGroup?.classList.toggle('hidden', !showDeliveryFields);
+    pincodeGroup?.classList.toggle('hidden', !showDeliveryFields);
+
+    const addressInput = $('#customer-address');
+    const pincodeInput = $('#customer-pincode');
+    if (addressInput) addressInput.required = showDeliveryFields;
+    if (pincodeInput) pincodeInput.required = showDeliveryFields;
+  }
+
+  function setSummaryExpanded(expanded) {
+    summaryExpanded = isCompactOrderLayout() ? true : expanded;
+    summaryToggleBtn?.setAttribute('aria-expanded', String(summaryExpanded));
+    summaryPanel?.classList.toggle('hidden', !summaryExpanded);
+
+    if (summaryToggleHint) {
+      summaryToggleHint.textContent = summaryExpanded
+        ? 'Order details are shown below'
+        : 'Tap to review order details';
+    }
+  }
+
+  function generateOrderId() {
+    return `VM-${Date.now().toString(36).toUpperCase()}`;
+  }
+
+  function buildUpiLink(orderState) {
+    const orderId = latestOrderSnapshot?.orderId || generateOrderId();
+    const params = new URLSearchParams({
+      pa: UPI_CONFIG.payeeVpa,
+      pn: UPI_CONFIG.payeeName,
+      am: String(orderState.total.toFixed(2)),
+      cu: 'INR',
+      tn: `${ORDER_PRODUCT} ${buildPaymentDescription(orderState.items)} (${orderId})`,
+    });
+
+    if (UPI_CONFIG.merchantCode) {
+      params.set('mc', UPI_CONFIG.merchantCode);
+    }
+
+    return {
+      orderId,
+      url: `upi://pay?${params.toString()}`,
+    };
+  }
+
+  function refreshPaymentUi() {
+    const state = buildOrderState();
+    const payment = buildUpiLink(state);
+    latestOrderSnapshot = { ...state, orderId: payment.orderId };
+
+    paymentCopy.textContent = `Scan or tap to pay ${formatCurrency(state.total)} for ${buildPaymentDescription(state.items)}.`;
+    paymentLink.href = payment.url;
+
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(payment.url)}`;
+    paymentQrImage.src = qrUrl;
+    paymentQrWrap.style.display = 'flex';
+  }
+
+  function clampQuantity(size) {
+    setSizeQuantity(size, getSizeQuantity(size));
+    updateSummary();
+  }
+
+  function openModal() {
+    backdrop.classList.remove('hidden');
+    backdrop.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setStatus('');
+    setSummaryExpanded(false);
+    setSubmitState('Pay Now', 'Generate secure UPI payment');
+    submitBtn.disabled = false;
+    updateDeliveryFields();
+    updateSummary();
+  }
+
+  function resetPaymentStep() {
+    paymentStepActive = false;
+    latestOrderSnapshot = null;
+    paymentPanel.classList.add('hidden');
+    paymentLink.classList.add('hidden');
+    paymentConfirmed.checked = false;
+    setSubmitState('Pay Now', 'Generate secure UPI payment');
+  }
+
+  function closeModal() {
+    backdrop.classList.add('hidden');
+    backdrop.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    form.reset();
+    setSizeQuantity('1000ml', 1);
+    setSizeQuantity('500ml', 0);
+    $('input[name="delivery"][value="pickup"]', form).checked = true;
+    setSummaryExpanded(false);
+    resetPaymentStep();
+    setStatus('');
+    updateDeliveryFields();
+    updateSummary();
+  }
+
+  function validateOrderForm() {
+    const customerName = $('#customer-name')?.value.trim() || '';
+    const phoneNumber = $('#phone-number')?.value.trim() || '';
+    const address = $('#customer-address')?.value.trim() || '';
+    const pincode = $('#customer-pincode')?.value.trim() || '';
+
+    if (customerName.length < 2) {
+      throw new Error('Please enter the customer name.');
+    }
+
+    if (!/^[0-9+\-\s]{10,15}$/.test(phoneNumber)) {
+      throw new Error('Please enter a valid phone number.');
+    }
+
+    if (!getSelectedItems().length) {
+      throw new Error('Please select at least one bottle before continuing.');
+    }
+
+    const deliveryMode = getSelectedValue('delivery') || 'pickup';
+
+    if (deliveryMode === 'home') {
+      if (address.length < 8) {
+        throw new Error('Please enter the delivery address.');
+      }
+
+      if (!/^\d{6}$/.test(pincode)) {
+        throw new Error('Please enter a valid 6-digit pincode.');
+      }
+    }
+  }
+
+  async function submitOrder(orderState) {
+    const customerName = $('#customer-name')?.value.trim() || '';
+    const phoneNumber = $('#phone-number')?.value.trim() || '';
+    const address = $('#customer-address')?.value.trim() || '';
+    const pincode = $('#customer-pincode')?.value.trim() || '';
+
+    await fetch(WAITLIST_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify({
+        action: 'order',
+        orderId: orderState.orderId,
+        product: orderState.product,
+        size: orderState.size,
+        quantity: orderState.quantity,
+        unitPrice: orderState.unitPrice,
+        subtotal: orderState.subtotal,
+        deliveryMode: orderState.deliveryMode,
+        deliveryFee: orderState.deliveryFee,
+        total: orderState.total,
+        customerName,
+        phoneNumber,
+        address,
+        pincode,
+        paymentStatus: 'paid',
+        source: 'groundnut-order-modal',
+        page: window.location.href,
+        userAgent: navigator.userAgent,
+      }),
+    });
+  }
+
+  openButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      $('#mobile-menu')?.classList.remove('open');
+      $('#nav-hamburger')?.querySelectorAll('span').forEach(s => {
+        s.style.transform = '';
+        s.style.opacity = '';
+      });
+      openModal();
+    });
+  });
+  closeBtn.addEventListener('click', closeModal);
+
+  summaryToggleBtn?.addEventListener('click', () => {
+    if (isCompactOrderLayout()) {
+      setSummaryExpanded(true);
+      return;
+    }
+
+    setSummaryExpanded(!summaryExpanded);
+  });
+
+  backdrop.addEventListener('click', event => {
+    if (event.target === backdrop) closeModal();
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !backdrop.classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+
+  qtyButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const size = button.dataset.size;
+      const action = button.dataset.qtyAction;
+      if (!size || !action) return;
+
+      const nextQuantity = action === 'increase'
+        ? getSizeQuantity(size) + 1
+        : getSizeQuantity(size) - 1;
+
+      setSizeQuantity(size, nextQuantity);
+      updateSummary();
+    });
+  });
+
+  Object.entries(sizeInputs).forEach(([size, input]) => {
+    input?.addEventListener('input', () => {
+      clampQuantity(size);
+    });
+  });
+
+  $$('input[name="delivery"]', form).forEach(input => {
+    input.addEventListener('change', () => {
+      updateDeliveryFields();
+      updateSummary();
+    });
+  });
+
+  paymentConfirmed.addEventListener('change', () => {
+    if (paymentConfirmed.checked) {
+      setStatus('Payment confirmed. You can finish the order now.');
+    } else {
+      setStatus('');
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    setSummaryExpanded(summaryExpanded);
+  });
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    setStatus('');
+
+    try {
+      validateOrderForm();
+
+      if (!paymentStepActive) {
+        paymentStepActive = true;
+        refreshPaymentUi();
+        paymentPanel.classList.remove('hidden');
+        paymentLink.classList.remove('hidden');
+        setSubmitState('Confirm Order', 'After payment is completed');
+        setSummaryExpanded(true);
+        paymentPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setStatus(
+          isPlaceholderVpa()
+            ? 'QR is ready. Replace the placeholder VPA in script.js before going live.'
+            : 'QR is ready. Complete payment, then tick the checkbox and confirm the order.'
+        );
+        return;
+      }
+
+      if (!paymentConfirmed.checked) {
+        throw new Error('Please confirm that the payment has been completed.');
+      }
+
+      submitBtn.disabled = true;
+      setSubmitState('Placing Order...', 'Please wait a moment');
+
+      await submitOrder(latestOrderSnapshot || { ...buildOrderState(), orderId: generateOrderId() });
+
+      setStatus('Payment received and order submitted. We will contact you shortly.', 'success');
+      setSubmitState('Order Placed', 'We will contact you shortly');
+
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        closeModal();
+      }, 1600);
+    } catch (error) {
+      submitBtn.disabled = false;
+      setSubmitState(
+        paymentStepActive ? 'Confirm Order' : 'Pay Now',
+        paymentStepActive ? 'After payment is completed' : 'Generate secure UPI payment'
+      );
+      setStatus(error.message || 'Unable to place the order right now.', 'error');
+    }
+  });
+
+  setSizeQuantity('1000ml', 1);
+  setSizeQuantity('500ml', 0);
+  updateDeliveryFields();
+  setSummaryExpanded(isCompactOrderLayout());
+  updateSummary();
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   8. SMOOTH SECTION TRANSITIONS (section bg glow)
    ═══════════════════════════════════════════════════════════ */
 (function initSectionGlow() {
   const sections = $$('section');
@@ -304,7 +772,7 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   8. OIL BOTTLE 3D HOVER (subtle tilt)
+   9. OIL BOTTLE 3D HOVER (subtle tilt)
    ═══════════════════════════════════════════════════════════ */
 (function initBottleTilt() {
   $$('.oil-card').forEach(card => {
@@ -327,7 +795,7 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   9. CINEMATIC SECTION TRANSITIONS (fade + slide)
+   10. CINEMATIC SECTION TRANSITIONS (fade + slide)
    ═══════════════════════════════════════════════════════════ */
 (function initCinematicFades() {
   // Stagger benefit cards
@@ -342,7 +810,7 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   10. DYNAMIC OIL SHIMMER on scroll
+   11. DYNAMIC OIL SHIMMER on scroll
    ═══════════════════════════════════════════════════════════ */
 (function initOilShimmer() {
   const bottles = $$('.product-bottle');
@@ -365,7 +833,7 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   11. COUNTER ANIMATION for About stats
+   12. COUNTER ANIMATION for About stats
    ═══════════════════════════════════════════════════════════ */
 (function initCounters() {
   const stats = $$('.stat-num');
@@ -394,7 +862,7 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   12. ACTIVE NAV HIGHLIGHT
+   13. ACTIVE NAV HIGHLIGHT
    ═══════════════════════════════════════════════════════════ */
 (function initActiveNav() {
   const sections = $$('section[id]');
@@ -417,7 +885,7 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   13. COMING SOON — animated text cycle
+   14. COMING SOON — animated text cycle
    ═══════════════════════════════════════════════════════════ */
 (function initTaglineCycle() {
   const taglines = [
@@ -431,7 +899,7 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   14. FOOTER EMBLEM ROTATION on hover
+   15. FOOTER EMBLEM ROTATION on hover
    ═══════════════════════════════════════════════════════════ */
 (function initFooterEmblem() {
   const emblem = $('.footer-emblem');
@@ -452,7 +920,7 @@ const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   15. INIT — final setup
+   16. INIT — final setup
    ═══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   // Ensure fonts loaded before animations
