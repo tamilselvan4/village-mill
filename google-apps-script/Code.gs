@@ -27,6 +27,15 @@ function doGet() {
   return jsonResponse_({ ok: true, service: 'Village Mill waitlist and orders' });
 }
 
+function doOptions() {
+  return ContentService
+    .createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+}
+
 function doPost(e) {
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
@@ -128,8 +137,27 @@ function saveOrder_(payload) {
 }
 
 function parsePayload_(e) {
-  if (!e || !e.postData || !e.postData.contents) return {};
-  return JSON.parse(e.postData.contents);
+  if (!e || !e.postData) return {};
+
+  const contentType = String(e.postData.type || '').toLowerCase();
+  const rawBody = e.postData.contents;
+
+  if (!rawBody) return {};
+
+  const bodyText = typeof rawBody === 'string' ? rawBody : Utilities.newBlob(rawBody).getDataAsString();
+  const trimmed = String(bodyText || '').trim();
+
+  if (!trimmed) return {};
+
+  if (contentType.includes('application/json') || contentType.includes('text/plain') || contentType.includes('application/x-www-form-urlencoded')) {
+    try {
+      return JSON.parse(trimmed);
+    } catch (error) {
+      return {};
+    }
+  }
+
+  return {};
 }
 
 function getSheet_(sheetName) {
@@ -189,7 +217,13 @@ function toNumber_(value) {
 }
 
 function jsonResponse_(payload) {
-  return ContentService
+  const output = ContentService
     .createTextOutput(JSON.stringify(payload))
     .setMimeType(ContentService.MimeType.JSON);
+
+  output.setHeader('Access-Control-Allow-Origin', '*');
+  output.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  output.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+
+  return output;
 }

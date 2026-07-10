@@ -12,10 +12,10 @@ const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const lerp = (a, b, t) => a + (b - a) * t;
 
-const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J2jFVT_xfaAGj-xF61HMqmaMwHc4UOZiTIXwKkN5Uj2WDSb838_eIeyhg/exec';
+const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwfhC9tUsTvaCWlNmIflTLH4uNluQrmDvzkL3TRwoN59aw1Anbg4MfPfUWQDTTLFs0sYg/exec';
 const ORDER_PRICING = {
   '500ml': 210,
-  '1000ml': 420,
+  '1000ml': 399,
 };
 const DELIVERY_FEE = 45;
 const ORDER_PRODUCT = 'Groundnut Oil';
@@ -319,18 +319,23 @@ const UPI_CONFIG = {
   const paymentQrWrap = $('#payment-qr-wrap');
   const paymentQrImage = $('#payment-qr-image');
   const paymentConfirmed = $('#payment-confirmed');
+  const userTypeCard = $('#user-type-card');
+  const newUserCheckbox = $('#new-user-checkbox');
   const submitBtn = $('#order-submit-btn');
+  const confirmBtn = $('#order-confirm-btn');
   const submitTitle = $('#order-submit-title');
   const submitNote = $('#order-submit-note');
   const summaryToggleBtn = $('#summary-toggle-btn');
   const summaryCompactTotal = $('#summary-compact-total');
   const summaryToggleHint = $('#summary-toggle-hint');
   const summaryPanel = $('#order-summary');
-  const status = $('#order-status');
+  const statusElements = $$('.order-status');
   const summarySizeQty = $('#summary-size-qty');
   const summarySubtotal = $('#summary-subtotal');
   const summaryDelivery = $('#summary-delivery');
   const summaryTotal = $('#summary-total');
+  const formTrack = $('#order-form-track');
+  const backBtn = $('#order-back-btn');
   if (!openButtons.length || !backdrop || !form) return;
 
   const sizeOrder = ['1000ml', '500ml'];
@@ -339,9 +344,25 @@ const UPI_CONFIG = {
   let summaryExpanded = false;
   let latestOrderSnapshot = null;
 
-  function setSubmitState(title, note) {
+  function setSubmitState(title, note = '') {
     if (submitTitle) submitTitle.textContent = title;
     if (submitNote) submitNote.textContent = note;
+  }
+
+  function showStep(step) {
+    paymentStepActive = step === 1;
+    if (formTrack) {
+      formTrack.style.transform = step === 0 ? 'translateX(0%)' : 'translateX(-50%)';
+    }
+    if (paymentPanel) {
+      paymentPanel.classList.toggle('hidden', step !== 1);
+    }
+
+    if (step === 0) {
+      setSubmitState('Pay Now');
+    } else {
+      setSubmitState('Place Order');
+    }
   }
 
   function isPlaceholderVpa() {
@@ -353,18 +374,24 @@ const UPI_CONFIG = {
   }
 
   function setStatus(message = '', type = '') {
-    status.textContent = message;
-    status.className = 'order-status';
-    if (!message) {
-      status.classList.add('hidden');
-      return;
-    }
-    status.classList.remove('hidden');
-    if (type) status.classList.add(type);
+    statusElements.forEach(status => {
+      status.textContent = message;
+      status.className = 'order-status';
+      if (!message) {
+        status.classList.add('hidden');
+        return;
+      }
+      status.classList.remove('hidden');
+      if (type) status.classList.add(type);
+    });
   }
 
   function getSelectedValue(name) {
     return $(`input[name="${name}"]:checked`, form)?.value;
+  }
+
+  function isNewUser() {
+    return Boolean(newUserCheckbox?.checked);
   }
 
   function getSizeQuantity(size) {
@@ -449,7 +476,7 @@ const UPI_CONFIG = {
     if (summaryToggleHint) {
       summaryToggleHint.textContent = summaryExpanded
         ? 'Order details are shown below'
-        : 'Tap to review order details';
+        : 'Tap + to review order details';
     }
 
     if (paymentStepActive) {
@@ -459,7 +486,14 @@ const UPI_CONFIG = {
 
   function updateDeliveryFields() {
     const deliveryMode = getSelectedValue('delivery') || 'pickup';
-    const showDeliveryFields = deliveryMode === 'home';
+    const isHomeDelivery = deliveryMode === 'home';
+    const requireAddressFields = isHomeDelivery && isNewUser();
+    const showDeliveryFields = isHomeDelivery && isNewUser();
+
+    userTypeCard?.classList.toggle('hidden', !isHomeDelivery);
+    if (!isHomeDelivery && newUserCheckbox) {
+      newUserCheckbox.checked = false;
+    }
 
     addressGroup?.classList.toggle('delivery-dependent', true);
     pincodeGroup?.classList.toggle('delivery-dependent', true);
@@ -468,19 +502,19 @@ const UPI_CONFIG = {
 
     const addressInput = $('#customer-address');
     const pincodeInput = $('#customer-pincode');
-    if (addressInput) addressInput.required = showDeliveryFields;
-    if (pincodeInput) pincodeInput.required = showDeliveryFields;
+    if (addressInput) addressInput.required = requireAddressFields;
+    if (pincodeInput) pincodeInput.required = requireAddressFields;
   }
 
   function setSummaryExpanded(expanded) {
-    summaryExpanded = isCompactOrderLayout() ? true : expanded;
+    summaryExpanded = expanded;
     summaryToggleBtn?.setAttribute('aria-expanded', String(summaryExpanded));
     summaryPanel?.classList.toggle('hidden', !summaryExpanded);
 
     if (summaryToggleHint) {
       summaryToggleHint.textContent = summaryExpanded
         ? 'Order details are shown below'
-        : 'Tap to review order details';
+        : 'Tap + to review order details';
     }
   }
 
@@ -515,6 +549,7 @@ const UPI_CONFIG = {
 
     paymentCopy.textContent = `Scan or tap to pay ${formatCurrency(state.total)} for ${buildPaymentDescription(state.items)}.`;
     paymentLink.href = payment.url;
+    paymentLink.classList.remove('hidden');
 
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(payment.url)}`;
     paymentQrImage.src = qrUrl;
@@ -532,8 +567,10 @@ const UPI_CONFIG = {
     document.body.style.overflow = 'hidden';
     setStatus('');
     setSummaryExpanded(false);
-    setSubmitState('Pay Now', 'Generate secure UPI payment');
+    showStep(0);
+    setSubmitState('Pay Now');
     submitBtn.disabled = false;
+    confirmBtn.disabled = true;
     updateDeliveryFields();
     updateSummary();
   }
@@ -543,7 +580,9 @@ const UPI_CONFIG = {
     latestOrderSnapshot = null;
     paymentPanel.classList.add('hidden');
     paymentLink.classList.add('hidden');
+    paymentQrWrap.style.display = 'none';
     paymentConfirmed.checked = false;
+    showStep(0);
     setSubmitState('Pay Now', 'Generate secure UPI payment');
   }
 
@@ -582,7 +621,7 @@ const UPI_CONFIG = {
 
     const deliveryMode = getSelectedValue('delivery') || 'pickup';
 
-    if (deliveryMode === 'home') {
+    if (deliveryMode === 'home' && isNewUser()) {
       if (address.length < 8) {
         throw new Error('Please enter the delivery address.');
       }
@@ -599,11 +638,11 @@ const UPI_CONFIG = {
     const address = $('#customer-address')?.value.trim() || '';
     const pincode = $('#customer-pincode')?.value.trim() || '';
 
-    await fetch(WAITLIST_ENDPOINT, {
+    const response = await fetch(WAITLIST_ENDPOINT, {
       method: 'POST',
-      mode: 'no-cors',
+      mode: 'cors',
       headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         action: 'order',
@@ -626,6 +665,21 @@ const UPI_CONFIG = {
         userAgent: navigator.userAgent,
       }),
     });
+
+    let payload = null;
+    const rawBody = await response.text();
+
+    if (rawBody) {
+      try {
+        payload = JSON.parse(rawBody);
+      } catch (error) {
+        payload = null;
+      }
+    }
+
+    if (!response.ok || !payload?.ok) {
+      throw new Error(payload?.error || 'Unable to submit the order right now.');
+    }
   }
 
   openButtons.forEach(button => {
@@ -641,11 +695,6 @@ const UPI_CONFIG = {
   closeBtn.addEventListener('click', closeModal);
 
   summaryToggleBtn?.addEventListener('click', () => {
-    if (isCompactOrderLayout()) {
-      setSummaryExpanded(true);
-      return;
-    }
-
     setSummaryExpanded(!summaryExpanded);
   });
 
@@ -687,7 +736,13 @@ const UPI_CONFIG = {
     });
   });
 
+  newUserCheckbox?.addEventListener('change', () => {
+    updateDeliveryFields();
+    updateSummary();
+  });
+
   paymentConfirmed.addEventListener('change', () => {
+    confirmBtn.disabled = !paymentConfirmed.checked;
     if (paymentConfirmed.checked) {
       setStatus('Payment confirmed. You can finish the order now.');
     } else {
@@ -699,26 +754,24 @@ const UPI_CONFIG = {
     setSummaryExpanded(summaryExpanded);
   });
 
-  form.addEventListener('submit', async event => {
-    event.preventDefault();
+  async function handlePrimaryAction(event) {
+    if (event) event.preventDefault();
     setStatus('');
 
     try {
       validateOrderForm();
 
       if (!paymentStepActive) {
-        paymentStepActive = true;
         refreshPaymentUi();
-        paymentPanel.classList.remove('hidden');
-        paymentLink.classList.remove('hidden');
-        setSubmitState('Confirm Order', 'After payment is completed');
+        showStep(1);
         setSummaryExpanded(true);
-        paymentPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         setStatus(
           isPlaceholderVpa()
             ? 'QR is ready. Replace the placeholder VPA in script.js before going live.'
             : 'QR is ready. Complete payment, then tick the checkbox and confirm the order.'
         );
+        submitBtn.disabled = false;
+        confirmBtn.disabled = !paymentConfirmed.checked;
         return;
       }
 
@@ -726,27 +779,32 @@ const UPI_CONFIG = {
         throw new Error('Please confirm that the payment has been completed.');
       }
 
-      submitBtn.disabled = true;
+      confirmBtn.disabled = true;
       setSubmitState('Placing Order...', 'Please wait a moment');
 
       await submitOrder(latestOrderSnapshot || { ...buildOrderState(), orderId: generateOrderId() });
 
       setStatus('Payment received and order submitted. We will contact you shortly.', 'success');
-      setSubmitState('Order Placed', 'We will contact you shortly');
+      setSubmitState('Order Placed');
 
       setTimeout(() => {
-        submitBtn.disabled = false;
+        confirmBtn.disabled = false;
         closeModal();
       }, 1600);
     } catch (error) {
       submitBtn.disabled = false;
-      setSubmitState(
-        paymentStepActive ? 'Confirm Order' : 'Pay Now',
-        paymentStepActive ? 'After payment is completed' : 'Generate secure UPI payment'
-      );
+      confirmBtn.disabled = !paymentConfirmed.checked;
+      setSubmitState(paymentStepActive ? 'Place Order' : 'Pay Now');
       setStatus(error.message || 'Unable to place the order right now.', 'error');
     }
+  }
+
+  submitBtn?.addEventListener('click', handlePrimaryAction);
+  backBtn?.addEventListener('click', () => {
+    setStatus('');
+    showStep(0);
   });
+  form.addEventListener('submit', handlePrimaryAction);
 
   setSizeQuantity('1000ml', 1);
   setSizeQuantity('500ml', 0);

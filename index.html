@@ -526,123 +526,155 @@
       </div>
 
       <form class="order-form" id="order-form">
-        <div class="order-form-scroll">
-          <div class="order-section-card order-size-list" aria-label="Select quantities">
-            <div class="size-row" data-size-row="1000ml">
-              <div class="size-row-copy">
-                <span class="size-row-title">1000ml</span>
-                <span class="size-row-price">Rs. 420 each</span>
+        <div class="order-form-viewport">
+          <div class="order-form-track" id="order-form-track">
+            <div class="order-step order-step-details">
+              <div class="order-form-scroll">
+                <div class="order-section-card order-size-list" aria-label="Select quantities">
+                  <div class="size-row" data-size-row="1000ml">
+                    <div class="size-row-copy">
+                      <span class="size-row-title">1000ml</span>
+                      <span class="size-row-price">Rs. 399 each</span>
+                    </div>
+                    <div class="quantity-control quantity-control-compact" data-size-control="1000ml">
+                      <button type="button" class="qty-btn" data-qty-action="decrease" data-size="1000ml" aria-label="Decrease 1000ml quantity">-</button>
+                      <input
+                        id="order-qty-1000"
+                        name="quantity1000"
+                        type="number"
+                        min="0"
+                        max="20"
+                        value="1"
+                        inputmode="numeric"
+                        aria-label="1000ml quantity"
+                      />
+                      <button type="button" class="qty-btn" data-qty-action="increase" data-size="1000ml" aria-label="Increase 1000ml quantity">+</button>
+                    </div>
+                  </div>
+
+                  <div class="size-row" data-size-row="500ml">
+                    <div class="size-row-copy">
+                      <span class="size-row-title">500ml</span>
+                      <span class="size-row-price">Rs. 210 each</span>
+                    </div>
+                    <div class="quantity-control quantity-control-compact" data-size-control="500ml">
+                      <button type="button" class="qty-btn" data-qty-action="decrease" data-size="500ml" aria-label="Decrease 500ml quantity">-</button>
+                      <input
+                        id="order-qty-500"
+                        name="quantity500"
+                        type="number"
+                        min="0"
+                        max="20"
+                        value="0"
+                        inputmode="numeric"
+                        aria-label="500ml quantity"
+                      />
+                      <button type="button" class="qty-btn" data-qty-action="increase" data-size="500ml" aria-label="Increase 500ml quantity">+</button>
+                    </div>
+                  </div>
+
+                  <p class="order-size-helper">Choose one or both sizes. You can adjust quantities anytime before payment.</p>
+                </div>
+
+                <div class="delivery-choice-row">
+                  <label class="choice-chip">
+                    <input type="radio" name="delivery" value="pickup" checked />
+                    <span>pickup</span>
+                  </label>
+                  <label class="choice-chip">
+                    <input type="radio" name="delivery" value="home" />
+                    <span>Home delivery</span>
+                  </label>
+                </div>
+
+                <div class="order-input-grid">
+                  <div class="order-field-group">
+                    <input id="customer-name" name="customerName" type="text" autocomplete="name" maxlength="60" placeholder="Name" required />
+                  </div>
+                  <div class="order-field-group">
+                    <input id="phone-number" name="phoneNumber" type="tel" autocomplete="tel" inputmode="tel" maxlength="15" placeholder="Mobile No." required />
+                  </div>
+                </div>
+
+                <div class="order-section-card user-type-card hidden" id="user-type-card">
+                  <label class="checkbox-row" for="new-user-checkbox">
+                    <input id="new-user-checkbox" name="newUser" type="checkbox" />
+                    <span>New user</span>
+                  </label>
+                  <p class="order-size-helper">Address and pincode are only required for new users when home delivery is selected.</p>
+                </div>
+
+                <div class="order-field-group address-block" id="address-group">
+                  <textarea id="customer-address" name="address" rows="3" autocomplete="street-address" placeholder="Address" required></textarea>
+                </div>
+
+                <div class="order-field-group order-pincode-group address-block">
+                  <input id="customer-pincode" name="pincode" type="text" autocomplete="postal-code" inputmode="numeric" maxlength="10" placeholder="pincode" required />
+                </div>
               </div>
-              <div class="quantity-control quantity-control-compact" data-size-control="1000ml">
-                <button type="button" class="qty-btn" data-qty-action="decrease" data-size="1000ml" aria-label="Decrease 1000ml quantity">-</button>
-                <input
-                  id="order-qty-1000"
-                  name="quantity1000"
-                  type="number"
-                  min="0"
-                  max="20"
-                  value="1"
-                  inputmode="numeric"
-                  aria-label="1000ml quantity"
-                />
-                <button type="button" class="qty-btn" data-qty-action="increase" data-size="1000ml" aria-label="Increase 1000ml quantity">+</button>
+
+              <p class="order-status hidden" id="order-status" aria-live="polite"></p>
+
+              <div class="summary-pay-row">
+                <div class="order-summary-compact" id="order-summary-compact">
+                  <div class="summary-toggle" aria-live="polite">
+                    <span class="summary-toggle-topline">
+                      <span class="summary-toggle-label">Order total</span>
+                      <button type="button" class="summary-caret" id="summary-toggle-btn" aria-expanded="false" aria-controls="order-summary" aria-label="Toggle order details">+</button>
+                    </span>
+                    <strong class="summary-compact-total" id="summary-compact-total"></strong>
+                    <span class="summary-toggle-hint" id="summary-toggle-hint">Tap + to review order details</span>
+                  </div>
+                  <div class="order-summary hidden" id="order-summary">
+                    <div class="summary-line summary-line-stack" id="summary-size-qty"></div>
+                    <div class="summary-line" id="summary-subtotal"></div>
+                    <div class="summary-line" id="summary-delivery"></div>
+                    <div class="summary-line summary-total" id="summary-total"></div>
+                  </div>
+                </div>
+
+                <button type="button" class="btn-primary modal-submit-btn" id="order-submit-btn">
+                  <span class="modal-submit-copy">
+                    <span class="modal-submit-title" id="order-submit-title">Pay Now</span>
+                  </span>
+                </button>
+              </div>
+
+            </div>
+
+            <div class="order-step order-step-payment">
+              <div class="order-form-scroll payment-step-scroll">
+                <div class="payment-panel hidden" id="payment-panel">
+                  <p class="payment-copy" id="payment-copy"></p>
+                  <div class="payment-qr-wrap" id="payment-qr-wrap">
+                    <img id="payment-qr-image" alt="UPI payment QR code" />
+                  </div>
+                  <a class="btn-primary payment-link hidden" id="upi-pay-link" href="#" target="_self" rel="noopener">
+                    <span>Open UPI App</span>
+                  </a>
+                  <label class="payment-confirm">
+                    <input type="checkbox" id="payment-confirmed" />
+                    <span>I have completed the payment</span>
+                  </label>
+                </div>
+              </div>
+
+              <p class="order-status hidden" id="order-status-payment" aria-live="polite"></p>
+
+              <div class="summary-pay-row payment-footer">
+                <button type="button" class="btn-secondary modal-back-btn" id="order-back-btn">
+                  <span>Back</span>
+                </button>
+                <button type="submit" class="btn-primary modal-submit-btn modal-submit-btn-confirm" id="order-confirm-btn" disabled>
+                  <span class="modal-submit-copy">
+                    <span class="modal-submit-title">Place Order</span>
+                  </span>
+                </button>
               </div>
             </div>
-
-            <div class="size-row" data-size-row="500ml">
-              <div class="size-row-copy">
-                <span class="size-row-title">500ml</span>
-                <span class="size-row-price">Rs. 210 each</span>
-              </div>
-              <div class="quantity-control quantity-control-compact" data-size-control="500ml">
-                <button type="button" class="qty-btn" data-qty-action="decrease" data-size="500ml" aria-label="Decrease 500ml quantity">-</button>
-                <input
-                  id="order-qty-500"
-                  name="quantity500"
-                  type="number"
-                  min="0"
-                  max="20"
-                  value="0"
-                  inputmode="numeric"
-                  aria-label="500ml quantity"
-                />
-                <button type="button" class="qty-btn" data-qty-action="increase" data-size="500ml" aria-label="Increase 500ml quantity">+</button>
-              </div>
-            </div>
-
-            <p class="order-size-helper">Choose one or both sizes. You can adjust quantities anytime before payment.</p>
-          </div>
-
-          <div class="delivery-choice-row">
-              <label class="choice-chip">
-                <input type="radio" name="delivery" value="pickup" checked />
-                <span>pickup</span>
-              </label>
-              <label class="choice-chip">
-                <input type="radio" name="delivery" value="home" />
-                <span>Home delivery</span>
-              </label>
-          </div>
-
-          <div class="order-input-grid">
-            <div class="order-field-group">
-              <input id="customer-name" name="customerName" type="text" autocomplete="name" maxlength="60" placeholder="Name" required />
-            </div>
-            <div class="order-field-group">
-              <input id="phone-number" name="phoneNumber" type="tel" autocomplete="tel" inputmode="tel" maxlength="15" placeholder="Mobile No." required />
-            </div>
-          </div>
-
-          <div class="order-field-group" id="address-group">
-            <textarea id="customer-address" name="address" rows="3" autocomplete="street-address" placeholder="Address" required></textarea>
-          </div>
-
-          <div class="order-field-group order-pincode-group">
-            <input id="customer-pincode" name="pincode" type="text" autocomplete="postal-code" inputmode="numeric" maxlength="10" placeholder="pincode" required />
-          </div>
-
-          <div class="payment-panel hidden" id="payment-panel">
-            <p class="payment-copy" id="payment-copy"></p>
-            <div class="payment-qr-wrap" id="payment-qr-wrap">
-              <img id="payment-qr-image" alt="UPI payment QR code" />
-            </div>
-            <a class="btn-primary payment-link hidden" id="upi-pay-link" href="#" target="_self" rel="noopener">
-              <span>Open UPI App</span>
-            </a>
-            <label class="payment-confirm">
-              <input type="checkbox" id="payment-confirmed" />
-              <span>I have completed the payment</span>
-            </label>
           </div>
         </div>
 
-        <div class="summary-pay-row">
-          <div class="order-summary-compact" id="order-summary-compact">
-            <button type="button" class="summary-toggle" id="summary-toggle-btn" aria-expanded="false" aria-controls="order-summary">
-              <span class="summary-toggle-topline">
-                <span class="summary-toggle-label">Order total</span>
-                <span class="summary-caret" id="summary-caret" aria-hidden="true">+</span>
-              </span>
-              <strong class="summary-compact-total" id="summary-compact-total"></strong>
-              <span class="summary-toggle-hint" id="summary-toggle-hint">Tap to review order details</span>
-            </button>
-            <div class="order-summary hidden" id="order-summary">
-              <div class="summary-line summary-line-stack" id="summary-size-qty"></div>
-              <div class="summary-line" id="summary-subtotal"></div>
-              <div class="summary-line" id="summary-delivery"></div>
-              <div class="summary-line summary-total" id="summary-total"></div>
-            </div>
-          </div>
-
-          <button type="submit" class="btn-primary modal-submit-btn" id="order-submit-btn">
-            <span class="modal-submit-copy">
-              <span class="modal-submit-title" id="order-submit-title">Pay Now</span>
-              <span class="modal-submit-note" id="order-submit-note">Generate secure UPI payment</span>
-            </span>
-          </button>
-        </div>
-
-        <p class="order-status hidden" id="order-status" aria-live="polite"></p>
       </form>
     </div>
   </div>

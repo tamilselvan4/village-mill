@@ -1212,12 +1212,43 @@ section {
   flex: 1;
 }
 
+.order-form-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.order-form-track {
+  display: flex;
+  width: 200%;
+  min-height: 100%;
+  height: 100%;
+  transition: transform 0.35s var(--ease-cinematic);
+}
+
+.order-step {
+  flex: 0 0 50%;
+  min-width: 50%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .order-form-scroll {
-  padding: 1rem 1.35rem 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0.9rem 0.95rem 1rem;
   overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 0.8rem;
+}
+
+.payment-step-scroll {
+  align-items: stretch;
+  padding-bottom: 0.4rem;
 }
 
 .order-field-group {
@@ -1246,6 +1277,18 @@ section {
   background: rgba(255,255,255,0.03);
   border-radius: 18px;
   padding: 0.9rem;
+}
+
+.order-section-label {
+  font-size: 0.72rem;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.65rem;
+}
+
+.user-type-card {
+  padding: 0.85rem 0.9rem;
 }
 
 .order-form input[type="text"],
@@ -1486,14 +1529,42 @@ section {
 .summary-pay-row {
   display: grid;
   grid-template-columns: 1.3fr 1fr;
-  gap: 0.9rem;
+  gap: 0.75rem;
   align-items: start;
-  margin: 1rem 1.35rem 0;
-  padding: 1rem 0 1.2rem;
+  margin: 0;
+  padding: 0.8rem 0.95rem 0.95rem;
   border-top: 1px solid rgba(201,168,76,0.12);
   background: linear-gradient(180deg, rgba(12,7,4,0), rgba(12,7,4,0.96) 24%);
-  position: sticky;
-  bottom: 0;
+  z-index: 3;
+  flex-shrink: 0;
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.22);
+}
+
+.payment-footer {
+  grid-template-columns: 0.95fr 1.4fr;
+  gap: 0.7rem;
+}
+
+.modal-back-btn {
+  min-height: 64px;
+  border: 1px solid rgba(201,168,76,0.24);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.04);
+  color: var(--cream);
+  font-family: var(--ff-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.modal-back-btn:hover,
+.modal-back-btn:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(201,168,76,0.42);
+  background: rgba(201,168,76,0.08);
 }
 
 .order-summary-compact {
@@ -1508,10 +1579,7 @@ section {
 .summary-toggle {
   width: 100%;
   min-height: 96px;
-  border: none;
-  background: transparent;
   color: var(--cream);
-  cursor: pointer;
   padding: 1rem 1.05rem 0.9rem;
   display: flex;
   flex-direction: column;
@@ -1543,13 +1611,15 @@ section {
   justify-content: center;
   border-radius: 999px;
   border: 1px solid rgba(201,168,76,0.2);
+  background: transparent;
   color: var(--gold);
   font-size: 1rem;
   line-height: 1;
+  cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.summary-toggle[aria-expanded="true"] .summary-caret {
+.summary-caret[aria-expanded="true"] {
   transform: rotate(45deg);
   background: rgba(201,168,76,0.12);
 }
@@ -1605,14 +1675,16 @@ section {
 }
 
 .order-status {
-  margin: 0 1.35rem 1.2rem;
-  padding: 0.85rem 1rem;
-  border-radius: 16px;
+  margin: 0 0.95rem 0.35rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 14px;
   border: 1px solid rgba(201,168,76,0.12);
-  background: rgba(255,255,255,0.03);
-  font-size: 0.84rem;
-  line-height: 1.5;
+  background: rgba(255,255,255,0.04);
+  font-size: 0.8rem;
+  line-height: 1.45;
   color: var(--gold);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .order-status.error {
@@ -1625,12 +1697,13 @@ section {
 
 .modal-submit-btn {
   width: 100%;
-  min-height: 96px;
+  min-height: 64px;
   justify-content: center;
   border: none;
-  border-radius: 20px;
-  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  padding: 0.75rem 0.9rem;
   align-self: start;
+  white-space: normal;
 }
 
 .modal-submit-copy {
@@ -1643,14 +1716,14 @@ section {
 }
 
 .modal-submit-title {
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
 }
 
 .modal-submit-note {
-  font-size: 0.74rem;
-  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
   color: rgba(20,10,3,0.72);
 }
 
@@ -1858,18 +1931,23 @@ section {
   .about-stats { grid-template-columns: 1fr; gap: 1rem; }
 
   .modal-backdrop {
-    padding: 0.5rem;
-    align-items: center;
+    padding: 0;
+    align-items: stretch;
+    justify-content: stretch;
   }
 
   .order-modal {
     width: 100%;
-    max-height: min(92vh, 780px);
-    border-radius: 16px;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
   }
 
   .order-modal-header {
-    padding: 0.9rem 0.9rem 0.7rem;
+    padding: calc(0.75rem + env(safe-area-inset-top)) 0.9rem 0.7rem;
   }
 
   .order-modal-header h3 {
@@ -1884,8 +1962,10 @@ section {
   }
 
   .order-form-scroll {
-    padding: 0.7rem 0.9rem 0;
+    padding: 0.7rem 0.9rem 0.85rem;
     gap: 0.55rem;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
 
   .order-input-grid,
@@ -1982,21 +2062,23 @@ section {
   }
 
   .summary-pay-row {
-    margin: 0.7rem 0.9rem 0;
-    padding: 0.8rem 0 0.85rem;
+    margin: 0;
+    padding: 0.8rem 0.9rem calc(0.9rem + env(safe-area-inset-bottom));
     gap: 0.65rem;
-    position: static;
+    background: linear-gradient(180deg, rgba(12,7,4,0.16), rgba(12,7,4,0.98) 20%);
+  }
+
+  .payment-footer {
+    grid-template-columns: 1fr;
   }
 
   .summary-toggle {
     min-height: auto;
-    padding: 0.85rem 0.9rem 0.75rem;
-    cursor: default;
-    pointer-events: none;
+    padding: 0.72rem 0.78rem 0.62rem;
   }
 
   .summary-toggle-label {
-    font-size: 0.86rem;
+    font-size: 0.8rem;
   }
 
   .summary-caret {
@@ -2006,23 +2088,23 @@ section {
   }
 
   .summary-compact-total {
-    font-size: 1.15rem;
+    font-size: 1rem;
   }
 
   .summary-toggle-hint,
   .summary-line {
-    font-size: 0.78rem;
+    font-size: 0.7rem;
   }
 
   .modal-submit-btn {
-    min-height: 72px;
-    border-radius: 16px;
-    padding: 0.85rem 1rem;
+    min-height: 52px;
+    border-radius: 14px;
+    padding: 0.68rem 0.82rem;
   }
 
   .modal-submit-title {
-    font-size: 0.88rem;
-    letter-spacing: 0.14em;
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
   }
 
   .modal-submit-note {
