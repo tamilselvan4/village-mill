@@ -325,10 +325,7 @@ const UPI_CONFIG = {
   const confirmBtn = $('#order-confirm-btn');
   const submitTitle = $('#order-submit-title');
   const submitNote = $('#order-submit-note');
-  const summaryToggleBtn = $('#summary-toggle-btn');
   const summaryCompactTotal = $('#summary-compact-total');
-  const summaryToggleHint = $('#summary-toggle-hint');
-  const summaryPanel = $('#order-summary');
   const statusElements = $$('.order-status');
   const summarySizeQty = $('#summary-size-qty');
   const summarySubtotal = $('#summary-subtotal');
@@ -341,7 +338,6 @@ const UPI_CONFIG = {
   const sizeOrder = ['1000ml', '500ml'];
 
   let paymentStepActive = false;
-  let summaryExpanded = false;
   let latestOrderSnapshot = null;
 
   function setSubmitState(title, note = '') {
@@ -473,12 +469,6 @@ const UPI_CONFIG = {
     summaryTotal.textContent = `Total = ${formatCurrency(state.total)}`;
     summaryCompactTotal.textContent = `Rs. ${state.total}`;
 
-    if (summaryToggleHint) {
-      summaryToggleHint.textContent = summaryExpanded
-        ? 'Order details are shown below'
-        : 'Tap + to review order details';
-    }
-
     if (paymentStepActive) {
       refreshPaymentUi();
     }
@@ -504,18 +494,6 @@ const UPI_CONFIG = {
     const pincodeInput = $('#customer-pincode');
     if (addressInput) addressInput.required = requireAddressFields;
     if (pincodeInput) pincodeInput.required = requireAddressFields;
-  }
-
-  function setSummaryExpanded(expanded) {
-    summaryExpanded = expanded;
-    summaryToggleBtn?.setAttribute('aria-expanded', String(summaryExpanded));
-    summaryPanel?.classList.toggle('hidden', !summaryExpanded);
-
-    if (summaryToggleHint) {
-      summaryToggleHint.textContent = summaryExpanded
-        ? 'Order details are shown below'
-        : 'Tap + to review order details';
-    }
   }
 
   function generateOrderId() {
@@ -566,7 +544,6 @@ const UPI_CONFIG = {
     backdrop.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     setStatus('');
-    setSummaryExpanded(false);
     showStep(0);
     setSubmitState('Pay Now');
     submitBtn.disabled = false;
@@ -594,7 +571,6 @@ const UPI_CONFIG = {
     setSizeQuantity('1000ml', 1);
     setSizeQuantity('500ml', 0);
     $('input[name="delivery"][value="pickup"]', form).checked = true;
-    setSummaryExpanded(false);
     resetPaymentStep();
     setStatus('');
     updateDeliveryFields();
@@ -694,10 +670,6 @@ const UPI_CONFIG = {
   });
   closeBtn.addEventListener('click', closeModal);
 
-  summaryToggleBtn?.addEventListener('click', () => {
-    setSummaryExpanded(!summaryExpanded);
-  });
-
   backdrop.addEventListener('click', event => {
     if (event.target === backdrop) closeModal();
   });
@@ -750,10 +722,6 @@ const UPI_CONFIG = {
     }
   });
 
-  window.addEventListener('resize', () => {
-    setSummaryExpanded(summaryExpanded);
-  });
-
   async function handlePrimaryAction(event) {
     if (event) event.preventDefault();
     setStatus('');
@@ -764,7 +732,6 @@ const UPI_CONFIG = {
       if (!paymentStepActive) {
         refreshPaymentUi();
         showStep(1);
-        setSummaryExpanded(true);
         setStatus(
           isPlaceholderVpa()
             ? 'QR is ready. Replace the placeholder VPA in script.js before going live.'
@@ -809,7 +776,6 @@ const UPI_CONFIG = {
   setSizeQuantity('1000ml', 1);
   setSizeQuantity('500ml', 0);
   updateDeliveryFields();
-  setSummaryExpanded(isCompactOrderLayout());
   updateSummary();
 })();
 

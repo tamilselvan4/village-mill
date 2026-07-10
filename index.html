@@ -573,7 +573,6 @@
                     </div>
                   </div>
 
-                  <p class="order-size-helper">Choose one or both sizes. You can adjust quantities anytime before payment.</p>
                 </div>
 
                 <div class="delivery-choice-row">
@@ -620,16 +619,8 @@
                   <div class="summary-toggle" aria-live="polite">
                     <span class="summary-toggle-topline">
                       <span class="summary-toggle-label">Order total</span>
-                      <button type="button" class="summary-caret" id="summary-toggle-btn" aria-expanded="false" aria-controls="order-summary" aria-label="Toggle order details">+</button>
                     </span>
                     <strong class="summary-compact-total" id="summary-compact-total"></strong>
-                    <span class="summary-toggle-hint" id="summary-toggle-hint">Tap + to review order details</span>
-                  </div>
-                  <div class="order-summary hidden" id="order-summary">
-                    <div class="summary-line summary-line-stack" id="summary-size-qty"></div>
-                    <div class="summary-line" id="summary-subtotal"></div>
-                    <div class="summary-line" id="summary-delivery"></div>
-                    <div class="summary-line summary-total" id="summary-total"></div>
                   </div>
                 </div>
 
@@ -646,16 +637,26 @@
               <div class="order-form-scroll payment-step-scroll">
                 <div class="payment-panel hidden" id="payment-panel">
                   <p class="payment-copy" id="payment-copy"></p>
-                  <div class="payment-qr-wrap" id="payment-qr-wrap">
-                    <img id="payment-qr-image" alt="UPI payment QR code" />
+                  <div class="payment-main">
+                    <div class="payment-qr-wrap" id="payment-qr-wrap">
+                      <img id="payment-qr-image" alt="UPI payment QR code" />
+                    </div>
+                    <div class="payment-side">
+                      <a class="btn-primary payment-link hidden" id="upi-pay-link" href="#" target="_self" rel="noopener">
+                        <span>Open UPI App</span>
+                      </a>
+                      <label class="payment-confirm">
+                        <input type="checkbox" id="payment-confirmed" />
+                        <span>I have completed the payment</span>
+                      </label>
+                      <div class="payment-summary">
+                        <div class="summary-line summary-line-stack" id="summary-size-qty"></div>
+                        <div class="summary-line" id="summary-subtotal"></div>
+                        <div class="summary-line" id="summary-delivery"></div>
+                        <div class="summary-line summary-total" id="summary-total"></div>
+                      </div>
+                    </div>
                   </div>
-                  <a class="btn-primary payment-link hidden" id="upi-pay-link" href="#" target="_self" rel="noopener">
-                    <span>Open UPI App</span>
-                  </a>
-                  <label class="payment-confirm">
-                    <input type="checkbox" id="payment-confirmed" />
-                    <span>I have completed the payment</span>
-                  </label>
                 </div>
               </div>
 
