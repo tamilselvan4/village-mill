@@ -614,11 +614,11 @@ const UPI_CONFIG = {
     const address = $('#customer-address')?.value.trim() || '';
     const pincode = $('#customer-pincode')?.value.trim() || '';
 
-    const response = await fetch(WAITLIST_ENDPOINT, {
+    await fetch(WAITLIST_ENDPOINT, {
       method: 'POST',
-      mode: 'cors',
+      mode: 'no-cors',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'text/plain;charset=utf-8',
       },
       body: JSON.stringify({
         action: 'order',
@@ -641,21 +641,6 @@ const UPI_CONFIG = {
         userAgent: navigator.userAgent,
       }),
     });
-
-    let payload = null;
-    const rawBody = await response.text();
-
-    if (rawBody) {
-      try {
-        payload = JSON.parse(rawBody);
-      } catch (error) {
-        payload = null;
-      }
-    }
-
-    if (!response.ok || !payload?.ok) {
-      throw new Error(payload?.error || 'Unable to submit the order right now.');
-    }
   }
 
   openButtons.forEach(button => {
