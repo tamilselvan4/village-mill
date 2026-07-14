@@ -135,6 +135,50 @@ const shouldUseLiteEffects = isTouchDevice || isMobileViewport || shouldReduceMo
 })();
 
 /* ═══════════════════════════════════════════════════════════
+   3B. FLOATING ORDER BUTTON VIEWPORT PIN
+   ═══════════════════════════════════════════════════════════ */
+(function initFloatingOrderButton() {
+  const button = $('.floating-order-btn');
+  if (!button) return;
+
+  const baseDesktopOffset = 24;
+  const baseMobileOffset = 16;
+
+  function updateButtonOffset() {
+    const viewport = window.visualViewport;
+    const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
+    const baseOffset = isSmallScreen ? baseMobileOffset : baseDesktopOffset;
+
+    if (!viewport) {
+      button.style.bottom = `${baseOffset}px`;
+      return;
+    }
+
+    const browserChromeOffset = Math.max(
+      0,
+      window.innerHeight - viewport.height - viewport.offsetTop
+    );
+
+    button.style.bottom = `${baseOffset + browserChromeOffset}px`;
+  }
+
+  let rafId = null;
+  function queueOffsetUpdate() {
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      updateButtonOffset();
+    });
+  }
+
+  updateButtonOffset();
+  window.addEventListener('resize', queueOffsetUpdate, { passive: true });
+  window.addEventListener('orientationchange', queueOffsetUpdate, { passive: true });
+  window.visualViewport?.addEventListener('resize', queueOffsetUpdate, { passive: true });
+  window.visualViewport?.addEventListener('scroll', queueOffsetUpdate, { passive: true });
+})();
+
+/* ═══════════════════════════════════════════════════════════
    4. SCROLL REVEAL (Intersection Observer)
    ═══════════════════════════════════════════════════════════ */
 (function initScrollReveal() {
