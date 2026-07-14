@@ -12,13 +12,32 @@ const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const lerp = (a, b, t) => a + (b - a) * t;
 
-const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwfhC9tUsTvaCWlNmIflTLH4uNluQrmDvzkL3TRwoN59aw1Anbg4MfPfUWQDTTLFs0sYg/exec';
-const ORDER_PRICING = {
-  '500ml': 210,
-  '1000ml': 399,
+const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxCPjALV8_ouQUm2Om1IQjOLIsqpgWv7DChlPW-0xjwCE2rMldUrJszVKVfqvXsPXlo/exec';
+const PRODUCT_CATALOG = {
+  'Groundnut Oil': {
+    skuPrefix: 'GN',
+    variants: {
+      '500ml': 210,
+      '1000ml': 399,
+    },
+  },
+  'Coconut Oil': {
+    skuPrefix: 'CO',
+    variants: {
+      '500ml': 0,
+      '1000ml': 0,
+    },
+  },
+  'Sesame Oil': {
+    skuPrefix: 'SO',
+    variants: {
+      '500ml': 0,
+      '1000ml': 0,
+    },
+  },
 };
 const DELIVERY_FEE = 45;
-const ORDER_PRODUCT = 'Groundnut Oil';
+const DEFAULT_ORDER_PRODUCT = 'Groundnut Oil';
 const UPI_CONFIG = {
   payeeName: 'The Village Mill',
   payeeVpa: 'village.mill@axl',
@@ -305,6 +324,7 @@ const UPI_CONFIG = {
   const openButtons = $$('[data-open-order-modal]');
   const backdrop = $('#order-modal-backdrop');
   const closeBtn = $('#order-modal-close');
+  const modalTitle = $('#order-modal-title');
   const form = $('#order-form');
   const sizeInputs = {
     '1000ml': $('#order-qty-1000'),
@@ -339,6 +359,22 @@ const UPI_CONFIG = {
 
   let paymentStepActive = false;
   let latestOrderSnapshot = null;
+  let activeProduct = DEFAULT_ORDER_PRODUCT;
+
+  function getProductConfig(productName = DEFAULT_ORDER_PRODUCT) {
+    return PRODUCT_CATALOG[productName] || PRODUCT_CATALOG[DEFAULT_ORDER_PRODUCT];
+  }
+
+  function getSku(productName, variant) {
+    const config = getProductConfig(productName);
+    const numericVariant = String(variant || '').replace(/[^\d]/g, '');
+
+    if (!config?.skuPrefix || !numericVariant) {
+      return '';
+    }
+
+    return `${config.skuPrefix}${numericVariant}`;
+  }
 
   function setSubmitState(title, note = '') {
     if (submitTitle) submitTitle.textContent = title;
@@ -363,10 +399,6 @@ const UPI_CONFIG = {
 
   function isPlaceholderVpa() {
     return !UPI_CONFIG.payeeVpa || /villagemill@upi/i.test(UPI_CONFIG.payeeVpa);
-  }
-
-  function isCompactOrderLayout() {
-    return window.matchMedia('(max-width: 480px)').matches;
   }
 
   function setStatus(message = '', type = '') {
@@ -406,48 +438,88 @@ const UPI_CONFIG = {
     return `₹${amount}`;
   }
 
-  function getSelectedItems() {
+  function getVariantPrice(productName, variant) {
+    const config = getProductConfig(productName);
+    return config?.variants?.[variant] || 0;
+  }
+
+  function buildOrderItems(productName = activeProduct) {
     return sizeOrder
-      .map(size => {
-        const quantity = getSizeQuantity(size);
+      .map(variant => {
+        const quantity = getSizeQuantity(variant);
+        const unitPrice = getVariantPrice(productName, variant);
+
         return {
-          size,
+          sku: getSku(productName, variant),
+          product: productName,
+          variant,
           quantity,
-          unitPrice: ORDER_PRICING[size] || 0,
-          subtotal: (ORDER_PRICING[size] || 0) * quantity,
+          unitPrice,
+          lineTotal: unitPrice * quantity,
         };
       })
       .filter(item => item.quantity > 0);
   }
 
-  function buildItemsSummary(items) {
-    return items.map(item => `${item.size} × ${item.quantity}`).join(', ');
+  function buildPaymentDescription(items) {
+    return items
+      .map(item => `${item.product} ${item.variant} × ${item.quantity}`)
+      .join(' + ');
   }
 
-  function buildPaymentDescription(items) {
-    return items.map(item => `${item.size} × ${item.quantity}`).join(' + ');
+  function calculateTotals(items, deliveryFee = 0, discount = 0) {
+    const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
+    const total = Math.max(0, subtotal + deliveryFee - discount);
+
+    return {
+      subtotal,
+      discount,
+      total,
+    };
+  }
+
+  function getCustomerDetails() {
+    return {
+      name: $('#customer-name')?.value.trim() || '',
+      phone: $('#phone-number')?.value.trim() || '',
+      address: $('#customer-address')?.value.trim() || '',
+      pincode: $('#customer-pincode')?.value.trim() || '',
+    };
+  }
+
+  function buildOrder(orderId = generateOrderId()) {
+    const items = buildOrderItems();
+    const deliveryMode = getSelectedValue('delivery') || 'pickup';
+    const deliveryFee = deliveryMode === 'home' ? DELIVERY_FEE : 0;
+    const pricing = calculateTotals(items, deliveryFee, 0);
+
+    return {
+      orderId,
+      createdAt: new Date().toISOString(),
+      customer: getCustomerDetails(),
+      delivery: {
+        mode: deliveryMode,
+        fee: deliveryFee,
+      },
+      payment: {
+        status: 'paid',
+        method: 'UPI',
+      },
+      pricing,
+      source: {
+        source: 'order-modal',
+        page: window.location.href,
+        userAgent: navigator.userAgent,
+      },
+      items,
+    };
   }
 
   function buildOrderState() {
-    const items = getSelectedItems();
-    const quantity = items.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
-    const deliveryMode = getSelectedValue('delivery') || 'pickup';
-    const deliveryFee = deliveryMode === 'home' ? DELIVERY_FEE : 0;
-    const total = subtotal + deliveryFee;
-    const size = items.length ? buildItemsSummary(items) : 'No size selected';
-    const effectiveUnitPrice = quantity > 0 ? Math.round(subtotal / quantity) : 0;
+    const order = buildOrder(latestOrderSnapshot?.orderId || generateOrderId());
 
     return {
-      product: ORDER_PRODUCT,
-      items,
-      size,
-      quantity,
-      unitPrice: effectiveUnitPrice,
-      subtotal,
-      deliveryMode,
-      deliveryFee,
-      total,
+      ...order,
     };
   }
 
@@ -456,18 +528,18 @@ const UPI_CONFIG = {
 
     if (state.items.length) {
       summarySizeQty.innerHTML = state.items
-        .map(item => `<span>${item.size} × ${item.quantity}</span><strong>${formatCurrency(item.subtotal)}</strong>`)
+        .map(item => `<span>${item.variant} × ${item.quantity}</span><strong>${formatCurrency(item.lineTotal)}</strong>`)
         .join('');
     } else {
       summarySizeQty.innerHTML = '<span>No size selected yet</span><strong>Rs. 0</strong>';
     }
 
-    summarySubtotal.textContent = `Subtotal = ${formatCurrency(state.subtotal)}`;
-    summaryDelivery.textContent = state.deliveryMode === 'home'
-      ? `Home delivery = ${formatCurrency(state.deliveryFee)}`
+    summarySubtotal.textContent = `Subtotal = ${formatCurrency(state.pricing.subtotal)}`;
+    summaryDelivery.textContent = state.delivery.mode === 'home'
+      ? `Home delivery = ${formatCurrency(state.delivery.fee)}`
       : 'Pickup = Free';
-    summaryTotal.textContent = `Total = ${formatCurrency(state.total)}`;
-    summaryCompactTotal.textContent = `Rs. ${state.total}`;
+    summaryTotal.textContent = `Total = ${formatCurrency(state.pricing.total)}`;
+    summaryCompactTotal.textContent = `Rs. ${state.pricing.total}`;
 
     if (paymentStepActive) {
       refreshPaymentUi();
@@ -505,9 +577,9 @@ const UPI_CONFIG = {
     const params = new URLSearchParams({
       pa: UPI_CONFIG.payeeVpa,
       pn: UPI_CONFIG.payeeName,
-      am: String(orderState.total.toFixed(2)),
+      am: String(orderState.pricing.total.toFixed(2)),
       cu: 'INR',
-      tn: `${ORDER_PRODUCT} ${buildPaymentDescription(orderState.items)} (${orderId})`,
+      tn: `${buildPaymentDescription(orderState.items)} (${orderId})`,
     });
 
     if (UPI_CONFIG.merchantCode) {
@@ -525,7 +597,7 @@ const UPI_CONFIG = {
     const payment = buildUpiLink(state);
     latestOrderSnapshot = { ...state, orderId: payment.orderId };
 
-    paymentCopy.textContent = `Scan or tap to pay ${formatCurrency(state.total)} for ${buildPaymentDescription(state.items)}.`;
+    paymentCopy.textContent = `Scan or tap to pay ${formatCurrency(state.pricing.total)} for ${buildPaymentDescription(state.items)}.`;
     paymentLink.href = payment.url;
     paymentLink.classList.remove('hidden');
 
@@ -543,6 +615,7 @@ const UPI_CONFIG = {
     backdrop.classList.remove('hidden');
     backdrop.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    if (modalTitle) modalTitle.textContent = activeProduct;
     setStatus('');
     showStep(0);
     setSubmitState('Pay Now');
@@ -578,42 +651,39 @@ const UPI_CONFIG = {
   }
 
   function validateOrderForm() {
-    const customerName = $('#customer-name')?.value.trim() || '';
-    const phoneNumber = $('#phone-number')?.value.trim() || '';
-    const address = $('#customer-address')?.value.trim() || '';
-    const pincode = $('#customer-pincode')?.value.trim() || '';
+    const customer = getCustomerDetails();
+    const items = buildOrderItems();
 
-    if (customerName.length < 2) {
+    if (customer.name.length < 2) {
       throw new Error('Please enter the customer name.');
     }
 
-    if (!/^[0-9+\-\s]{10,15}$/.test(phoneNumber)) {
+    if (!/^[0-9+\-\s]{10,15}$/.test(customer.phone)) {
       throw new Error('Please enter a valid phone number.');
     }
 
-    if (!getSelectedItems().length) {
+    if (!items.length) {
       throw new Error('Please select at least one bottle before continuing.');
+    }
+
+    if (items.some(item => item.quantity <= 0)) {
+      throw new Error('Please select valid quantities before continuing.');
     }
 
     const deliveryMode = getSelectedValue('delivery') || 'pickup';
 
     if (deliveryMode === 'home' && isNewUser()) {
-      if (address.length < 8) {
+      if (customer.address.length < 8) {
         throw new Error('Please enter the delivery address.');
       }
 
-      if (!/^\d{6}$/.test(pincode)) {
+      if (!/^\d{6}$/.test(customer.pincode)) {
         throw new Error('Please enter a valid 6-digit pincode.');
       }
     }
   }
 
-  async function submitOrder(orderState) {
-    const customerName = $('#customer-name')?.value.trim() || '';
-    const phoneNumber = $('#phone-number')?.value.trim() || '';
-    const address = $('#customer-address')?.value.trim() || '';
-    const pincode = $('#customer-pincode')?.value.trim() || '';
-
+  async function submitOrder(order) {
     await fetch(WAITLIST_ENDPOINT, {
       method: 'POST',
       mode: 'no-cors',
@@ -622,29 +692,14 @@ const UPI_CONFIG = {
       },
       body: JSON.stringify({
         action: 'order',
-        orderId: orderState.orderId,
-        product: orderState.product,
-        size: orderState.size,
-        quantity: orderState.quantity,
-        unitPrice: orderState.unitPrice,
-        subtotal: orderState.subtotal,
-        deliveryMode: orderState.deliveryMode,
-        deliveryFee: orderState.deliveryFee,
-        total: orderState.total,
-        customerName,
-        phoneNumber,
-        address,
-        pincode,
-        paymentStatus: 'paid',
-        source: 'groundnut-order-modal',
-        page: window.location.href,
-        userAgent: navigator.userAgent,
+        ...order,
       }),
     });
   }
 
   openButtons.forEach(button => {
     button.addEventListener('click', () => {
+      activeProduct = button.dataset.product || DEFAULT_ORDER_PRODUCT;
       $('#mobile-menu')?.classList.remove('open');
       $('#nav-hamburger')?.querySelectorAll('span').forEach(s => {
         s.style.transform = '';
@@ -734,7 +789,7 @@ const UPI_CONFIG = {
       confirmBtn.disabled = true;
       setSubmitState('Placing Order...', 'Please wait a moment');
 
-      await submitOrder(latestOrderSnapshot || { ...buildOrderState(), orderId: generateOrderId() });
+      await submitOrder(latestOrderSnapshot || buildOrder(generateOrderId()));
 
       setStatus('Payment received and order submitted. We will contact you shortly.', 'success');
       setSubmitState('Order Placed');

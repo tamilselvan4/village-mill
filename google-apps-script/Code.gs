@@ -1,26 +1,34 @@
 const WAITLIST_SHEET_NAME = 'Waitlist';
 const ORDERS_SHEET_NAME = 'Orders';
+const ORDER_ITEMS_SHEET_NAME = 'Order Items';
 const SPREADSHEET_ID = '';
 const WAITLIST_HEADERS = ['Timestamp', 'Email', 'Source', 'Page', 'User Agent'];
 const ORDER_HEADERS = [
-  'Timestamp',
   'Order ID',
-  'Product',
-  'Size',
-  'Quantity',
-  'Unit Price',
-  'Subtotal',
-  'Delivery Mode',
-  'Delivery Fee',
-  'Total',
+  'Created At',
   'Customer Name',
-  'Phone Number',
+  'Phone',
   'Address',
   'Pincode',
+  'Delivery Mode',
+  'Delivery Fee',
+  'Subtotal',
+  'Discount',
+  'Total',
   'Payment Status',
+  'Payment Method',
   'Source',
   'Page',
   'User Agent',
+];
+const ORDER_ITEM_HEADERS = [
+  'Order ID',
+  'SKU',
+  'Product',
+  'Variant',
+  'Quantity',
+  'Unit Price',
+  'Line Total',
 ];
 
 function doGet() {
@@ -81,56 +89,84 @@ function saveWaitlist_(payload) {
 
 function saveOrder_(payload) {
   const orderId = String(payload.orderId || '').trim();
-  const product = String(payload.product || '').trim();
-  const size = String(payload.size || '').trim();
-  const deliveryMode = String(payload.deliveryMode || '').trim();
-  const customerName = String(payload.customerName || '').trim();
-  const phoneNumber = String(payload.phoneNumber || '').trim();
-  const address = String(payload.address || '').trim();
-  const pincode = String(payload.pincode || '').trim();
-  const paymentStatus = String(payload.paymentStatus || '').trim() || 'paid';
-  const quantity = toNumber_(payload.quantity);
-  const unitPrice = toNumber_(payload.unitPrice);
-  const subtotal = toNumber_(payload.subtotal);
-  const deliveryFee = toNumber_(payload.deliveryFee);
-  const total = toNumber_(payload.total);
+  const createdAt = String(payload.createdAt || '').trim();
+  const customer = payload.customer || {};
+  const delivery = payload.delivery || {};
+  const payment = payload.payment || {};
+  const pricing = payload.pricing || {};
+  const source = payload.source || {};
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  const customerName = String(customer.name || '').trim();
+  const phone = String(customer.phone || '').trim();
+  const address = String(customer.address || '').trim();
+  const pincode = String(customer.pincode || '').trim();
+  const deliveryMode = String(delivery.mode || '').trim();
+  const deliveryFee = toNumber_(delivery.fee);
+  const subtotal = toNumber_(pricing.subtotal);
+  const discount = toNumber_(pricing.discount);
+  const total = toNumber_(pricing.total);
+  const paymentStatus = String(payment.status || '').trim() || 'paid';
+  const paymentMethod = String(payment.method || '').trim() || 'UPI';
+  const sourceName = String(source.source || '').trim();
+  const page = String(source.page || '').trim();
+  const userAgent = String(source.userAgent || '').trim();
   const isHomeDelivery = deliveryMode === 'home';
 
   if (!orderId) throw new Error('Missing order ID');
-  if (!product) throw new Error('Missing product');
-  if (!size) throw new Error('Missing size');
-  if (quantity < 1) throw new Error('Invalid quantity');
-  if (unitPrice <= 0 || subtotal <= 0 || total <= 0) throw new Error('Invalid order amount');
-  if (!customerName) throw new Error('Missing customer name');
-  if (!isValidPhone_(phoneNumber)) throw new Error('Invalid phone number');
+  if (!createdAt) throw new Error('Missing created timestamp');
+  if (customerName.length < 2) throw new Error('Missing customer name');
+  if (!isValidPhone_(phone)) throw new Error('Invalid phone number');
   if (deliveryMode !== 'pickup' && deliveryMode !== 'home') throw new Error('Invalid delivery mode');
-  if (isHomeDelivery && !address) throw new Error('Missing address');
+  if (!items.length) throw new Error('At least one order item is required');
+  if (subtotal <= 0 || total <= 0 || total !== subtotal + deliveryFee - discount) {
+    throw new Error('Invalid order totals');
+  }
+  if (isHomeDelivery && address.length < 8) throw new Error('Missing address');
   if (isHomeDelivery && !isValidPincode_(pincode)) throw new Error('Invalid pincode');
 
-  const sheet = getSheet_(ORDERS_SHEET_NAME);
-  ensureHeaders_(sheet, ORDER_HEADERS);
+  const validatedItems = items.map(validateOrderItem_);
+  const recalculatedSubtotal = validatedItems.reduce((sum, item) => sum + item.lineTotal, 0);
 
-  if (!hasOrderId_(sheet, orderId)) {
-    sheet.appendRow([
-      new Date(),
+  if (recalculatedSubtotal !== subtotal) {
+    throw new Error('Subtotal does not match order items');
+  }
+
+  const orderSheet = getSheet_(ORDERS_SHEET_NAME);
+  const itemSheet = getSheet_(ORDER_ITEMS_SHEET_NAME);
+  ensureHeaders_(orderSheet, ORDER_HEADERS);
+  ensureHeaders_(itemSheet, ORDER_ITEM_HEADERS);
+
+  if (!hasOrderId_(orderSheet, orderId)) {
+    orderSheet.appendRow([
       orderId,
-      product,
-      size,
-      quantity,
-      unitPrice,
-      subtotal,
-      deliveryMode,
-      deliveryFee,
-      total,
+      createdAt,
       customerName,
-      phoneNumber,
+      phone,
       address,
       pincode,
+      deliveryMode,
+      deliveryFee,
+      subtotal,
+      discount,
+      total,
       paymentStatus,
-      payload.source || '',
-      payload.page || '',
-      payload.userAgent || '',
+      paymentMethod,
+      sourceName,
+      page,
+      userAgent,
     ]);
+
+    validatedItems.forEach(item => {
+      itemSheet.appendRow([
+        orderId,
+        item.sku,
+        item.product,
+        item.variant,
+        item.quantity,
+        item.unitPrice,
+        item.lineTotal,
+      ]);
+    });
   }
 
   return jsonResponse_({ ok: true, orderId });
@@ -195,8 +231,33 @@ function hasOrderId_(sheet, orderId) {
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return false;
 
-  const orderIds = sheet.getRange(2, 2, lastRow - 1, 1).getValues();
+  const orderIds = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
   return orderIds.some(row => String(row[0]).trim() === orderId);
+}
+
+function validateOrderItem_(item) {
+  const sku = String(item.sku || '').trim();
+  const product = String(item.product || '').trim();
+  const variant = String(item.variant || '').trim();
+  const quantity = toNumber_(item.quantity);
+  const unitPrice = toNumber_(item.unitPrice);
+  const lineTotal = toNumber_(item.lineTotal);
+
+  if (!sku) throw new Error('Missing item SKU');
+  if (!product) throw new Error('Missing item product');
+  if (!variant) throw new Error('Missing item variant');
+  if (quantity < 1) throw new Error('Invalid item quantity');
+  if (unitPrice < 0) throw new Error('Invalid item unit price');
+  if (lineTotal !== quantity * unitPrice) throw new Error('Invalid item line total');
+
+  return {
+    sku,
+    product,
+    variant,
+    quantity,
+    unitPrice,
+    lineTotal,
+  };
 }
 
 function isValidEmail_(email) {
