@@ -345,6 +345,7 @@ const UPI_CONFIG = {
   const confirmBtn = $('#order-confirm-btn');
   const submitTitle = $('#order-submit-title');
   const submitNote = $('#order-submit-note');
+  const orderToast = $('#order-toast');
   const summaryCompactTotal = $('#summary-compact-total');
   const statusElements = $$('.order-status');
   const summarySizeQty = $('#summary-size-qty');
@@ -360,6 +361,8 @@ const UPI_CONFIG = {
   let paymentStepActive = false;
   let latestOrderSnapshot = null;
   let activeProduct = DEFAULT_ORDER_PRODUCT;
+  let upiAppOpened = false;
+  let orderToastTimer = 0;
 
   function getProductConfig(productName = DEFAULT_ORDER_PRODUCT) {
     return PRODUCT_CATALOG[productName] || PRODUCT_CATALOG[DEFAULT_ORDER_PRODUCT];
@@ -412,6 +415,24 @@ const UPI_CONFIG = {
       status.classList.remove('hidden');
       if (type) status.classList.add(type);
     });
+  }
+
+  function showOrderToast(message) {
+    if (!orderToast) return;
+
+    orderToast.textContent = message;
+    orderToast.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      orderToast.classList.add('visible');
+    });
+
+    window.clearTimeout(orderToastTimer);
+    orderToastTimer = window.setTimeout(() => {
+      orderToast.classList.remove('visible');
+      window.setTimeout(() => {
+        orderToast.classList.add('hidden');
+      }, 220);
+    }, 2600);
   }
 
   function getSelectedValue(name) {
@@ -620,6 +641,7 @@ const UPI_CONFIG = {
     showStep(0);
     setSubmitState('Pay Now');
     submitBtn.disabled = false;
+    upiAppOpened = false;
     confirmBtn.disabled = true;
     updateDeliveryFields();
     updateSummary();
@@ -628,12 +650,14 @@ const UPI_CONFIG = {
   function resetPaymentStep() {
     paymentStepActive = false;
     latestOrderSnapshot = null;
+    upiAppOpened = false;
     paymentPanel.classList.add('hidden');
     paymentLink.classList.add('hidden');
     paymentQrWrap.style.display = 'none';
     paymentConfirmed.checked = false;
     showStep(0);
     setSubmitState('Pay Now', 'Generate secure UPI payment');
+    confirmBtn.disabled = true;
   }
 
   function closeModal() {
@@ -754,12 +778,17 @@ const UPI_CONFIG = {
   });
 
   paymentConfirmed.addEventListener('change', () => {
-    confirmBtn.disabled = !paymentConfirmed.checked;
     if (paymentConfirmed.checked) {
       setStatus('Payment confirmed. You can finish the order now.');
     } else {
       setStatus('');
     }
+  });
+
+  paymentLink?.addEventListener('click', () => {
+    upiAppOpened = true;
+    confirmBtn.disabled = false;
+    setStatus('UPI app opened. Once payment is complete, you can place the order.');
   });
 
   async function handlePrimaryAction(event) {
@@ -775,32 +804,27 @@ const UPI_CONFIG = {
         setStatus(
           isPlaceholderVpa()
             ? 'QR is ready. Replace the placeholder VPA in script.js before going live.'
-            : 'QR is ready. Complete payment, then tick the checkbox and confirm the order.'
+            : 'Payment is ready. Open your UPI app once to enable placing the order.'
         );
         submitBtn.disabled = false;
-        confirmBtn.disabled = !paymentConfirmed.checked;
+        confirmBtn.disabled = !upiAppOpened;
         return;
       }
 
-      if (!paymentConfirmed.checked) {
-        throw new Error('Please confirm that the payment has been completed.');
-      }
-
       confirmBtn.disabled = true;
-      setSubmitState('Placing Order...', 'Please wait a moment');
-
-      await submitOrder(latestOrderSnapshot || buildOrder(generateOrderId()));
-
-      setStatus('Payment received and order submitted. We will contact you shortly.', 'success');
       setSubmitState('Order Placed');
 
-      setTimeout(() => {
-        confirmBtn.disabled = false;
-        closeModal();
-      }, 1600);
+      const orderPayload = latestOrderSnapshot || buildOrder(generateOrderId());
+      showOrderToast('Order placed successfully. We will contact you shortly.');
+      closeModal();
+
+      submitOrder(orderPayload).catch(error => {
+        console.error('Order submission failed', error);
+      });
+      return;
     } catch (error) {
       submitBtn.disabled = false;
-      confirmBtn.disabled = !paymentConfirmed.checked;
+      confirmBtn.disabled = !paymentStepActive || !upiAppOpened;
       setSubmitState(paymentStepActive ? 'Place Order' : 'Pay Now');
       setStatus(error.message || 'Unable to place the order right now.', 'error');
     }
@@ -809,7 +833,7 @@ const UPI_CONFIG = {
   submitBtn?.addEventListener('click', handlePrimaryAction);
   backBtn?.addEventListener('click', () => {
     setStatus('');
-    showStep(0);
+    resetPaymentStep();
   });
   form.addEventListener('submit', handlePrimaryAction);
 
