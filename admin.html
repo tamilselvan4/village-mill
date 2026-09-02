@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - The Village Mill</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">
+      <img src="village-mill-logo.png" alt="" />
+      <span>The Village Mill</span>
+    </a>
+    <nav class="top-nav" aria-label="Admin navigation">
+      <a href="/">Store</a>
+      <a href="#products">Products</a>
+      <a href="#orders">Orders</a>
+    </nav>
+    <button class="btn btn-dark" id="admin-auth-button" type="button">Sign in with Google</button>
+  </header>
+
+  <main class="admin-main">
+    <section class="section-heading">
+      <div>
+        <p class="eyebrow">Admin</p>
+        <h2>Products and orders</h2>
+      </div>
+    </section>
+
+    <section class="admin-grid">
+      <article class="admin-card" id="products">
+        <div class="section-heading compact">
+          <p class="eyebrow">Products</p>
+          <h2>Add oil</h2>
+        </div>
+        <form class="admin-form" id="product-form">
+          <label>
+            Product name
+            <input name="name" type="text" placeholder="Groundnut Oil" required />
+          </label>
+          <label>
+            URL slug
+            <input name="slug" type="text" placeholder="groundnut-oil-500ml" required />
+          </label>
+          <label>
+            Size
+            <input name="size" type="text" placeholder="1 L" required />
+          </label>
+          <label>
+            Price in INR
+            <input name="price_inr" type="number" min="1" placeholder="399" required />
+          </label>
+          <label>
+            Stock
+            <input name="stock" type="number" min="0" placeholder="50" required />
+          </label>
+          <label>
+            Short description
+            <textarea name="description" rows="4" required></textarea>
+          </label>
+          <button class="btn btn-primary" type="submit">Add product</button>
+        </form>
+      </article>
+
+      <section class="admin-card" id="orders">
+        <div class="section-heading compact">
+          <p class="eyebrow">Orders</p>
+          <h2>Track orders</h2>
+        </div>
+        <div class="admin-orders" id="admin-orders"></div>
+      </section>
+    </section>
+  </main>
+
+  <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+  <script src="admin.js"></script>
+</body>
+</html>
