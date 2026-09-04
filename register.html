@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register | The Village Mill</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/ecommerce.css" />
+</head>
+<body>
+
+  <div id="cursor-glow"></div>
+  <div id="cursor-dot"></div>
+
+  <!-- NAVIGATION -->
+  <nav id="main-nav" class="scrolled">
+    <div class="nav-brand">
+      <a href="index.html" class="nav-logo-text">The Village Mill</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#why-cold">Why Cold Pressed</a></li>
+      <li><a href="index.html#our-oils">Our Oils</a></li>
+      <li><a href="index.html#process">Process</a></li>
+      <li class="nav-account-slot"><a href="login.html">👤 Account</a></li>
+      <li><a href="cart.html">🛒 Cart (<span class="nav-cart-badge-count">0</span>)</a></li>
+    </ul>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="ecom-page">
+    <div class="ecom-container">
+      <div class="auth-wrapper">
+        
+        <div class="ecom-title-section">
+          <div class="ecom-eyebrow">Join The Family</div>
+          <h1 class="ecom-title">Create an Account</h1>
+          <p class="ecom-subtitle">Register for easy ordering and exclusive founding benefits.</p>
+        </div>
+
+        <div class="ecom-card">
+          <div id="auth-alert" class="ecom-alert hidden"></div>
+
+          <form id="register-form">
+            <div class="ecom-form-group">
+              <label for="reg-name" class="ecom-label">Full Name</label>
+              <input type="text" id="reg-name" class="ecom-input" placeholder="Tamil Selvan" required autocomplete="name" />
+            </div>
+
+            <div class="ecom-form-group">
+              <label for="reg-email" class="ecom-label">Email Address</label>
+              <input type="email" id="reg-email" class="ecom-input" placeholder="user@example.com" required autocomplete="email" />
+            </div>
+
+            <div class="ecom-form-group">
+              <label for="reg-phone" class="ecom-label">Phone Number</label>
+              <input type="tel" id="reg-phone" class="ecom-input" placeholder="9876543210" required autocomplete="tel" />
+            </div>
+
+            <div class="ecom-form-row">
+              <div class="ecom-form-group">
+                <label for="reg-password" class="ecom-label">Password</label>
+                <input type="password" id="reg-password" class="ecom-input" placeholder="••••••••" required autocomplete="new-password" />
+              </div>
+
+              <div class="ecom-form-group">
+                <label for="reg-confirm-password" class="ecom-label">Confirm Password</label>
+                <input type="password" id="reg-confirm-password" class="ecom-input" placeholder="••••••••" required autocomplete="new-password" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+              <span>Register Account</span>
+            </button>
+          </form>
+
+          <div class="auth-footer-text">
+            Already have an account? <a href="login.html">Sign In</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <p class="footer-tagline">Tradition Pressed Into Purity</p>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 The Village Mill. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

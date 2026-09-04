@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Details | The Village Mill</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/ecommerce.css" />
+</head>
+<body>
+
+  <div id="cursor-glow"></div>
+  <div id="cursor-dot"></div>
+
+  <!-- NAVIGATION -->
+  <nav id="main-nav" class="scrolled">
+    <div class="nav-brand">
+      <a href="index.html" class="nav-logo-text">The Village Mill</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="orders.html">My Orders</a></li>
+      <li><a href="track-order.html">Track Order</a></li>
+      <li class="nav-account-slot"><a href="profile.html">👤 Account</a></li>
+      <li><a href="cart.html">🛒 Cart (<span class="nav-cart-badge-count">0</span>)</a></li>
+    </ul>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="ecom-page">
+    <div class="ecom-container" style="max-width: 800px;">
+      
+      <div class="ecom-title-section">
+        <div class="ecom-eyebrow">Order Summary</div>
+        <h1 class="ecom-title" id="order-details-title">Order Details</h1>
+      </div>
+
+      <div id="order-details-alert" class="ecom-alert hidden"></div>
+
+      <div id="order-details-container">
+        <p class="ecom-subtitle" style="text-align: center;">Loading order details...</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <p class="footer-tagline">Tradition Pressed Into Purity</p>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 The Village Mill. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById('order-details-container');
+      const titleEl = document.getElementById('order-details-title');
+      const alertBox = document.getElementById('order-details-alert');
+
+      const params = new URLSearchParams(window.location.search);
+      const orderNum = params.get('order');
+
+      if (!orderNum) {
+        container.innerHTML = '<p class="ecom-alert ecom-alert-error">No order specified. <a href="orders.html" style="color: var(--gold);">Back to Orders</a></p>';
+        return;
+      }
+
+      titleEl.textContent = `Order #${orderNum}`;
+
+      try {
+        const order = await api.get(`/api/orders/${encodeURIComponent(orderNum)}`);
+
+        if (!order) {
+          throw new Error('Order not found.');
+        }
+
+        const dateStr = order.createdAt || order.orderDate ? new Date(order.createdAt || order.orderDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A';
+        const items = order.items || [];
+        const shipping = order.shipping || {};
+        const payStatus = (order.paymentStatus || 'PAID').toUpperCase();
+        const orderStatus = (order.status || 'PROCESSING').toUpperCase();
+
+        container.innerHTML = `
+          <div class="ecom-card" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(201,168,76,0.15); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <span style="color: var(--cream-dim); font-size: 0.85rem; display: block;">Order Date</span>
+                <strong style="color: var(--cream);">${dateStr}</strong>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <span class="status-badge badge-paid">${payStatus}</span>
+                <span class="status-badge badge-processing">${orderStatus.replace('_', ' ')}</span>
+              </div>
+            </div>
+
+            <h3 style="font-family: var(--ff-serif); color: var(--gold); font-size: 1.2rem; margin-bottom: 1rem;">Products</h3>
+            
+            <div style="border-bottom: 1px solid rgba(201,168,76,0.12); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+              ${items.map(i => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0;">
+                  <div>
+                    <strong style="color: var(--cream); font-size: 1rem; display: block;">${escapeHtml(i.productName || i.name)} × ${i.quantity || 1}</strong>
+                    <span style="color: var(--cream-dim); font-size: 0.8rem;">₹${i.unitPrice || i.price} each</span>
+                  </div>
+                  <strong style="color: var(--gold); font-size: 1.1rem;">₹${((i.unitPrice || i.price || 0) * (i.quantity || 1)).toLocaleString('en-IN')}</strong>
+                </div>
+              `).join('')}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+              <div>
+                <h4 style="color: var(--gold); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Delivery Address</h4>
+                <p style="color: var(--cream); font-size: 0.9rem; margin-bottom: 0.2rem;"><strong>${escapeHtml(shipping.name || 'Recipient')}</strong> (${escapeHtml(shipping.phone || '')})</p>
+                <p style="color: var(--cream-dim); font-size: 0.85rem;">${escapeHtml(shipping.address || '')}, ${escapeHtml(shipping.city || '')}, ${escapeHtml(shipping.state || '')} - ${escapeHtml(shipping.pincode || '')}</p>
+              </div>
+              <div style="text-align: right;">
+                <h4 style="color: var(--gold); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Total Paid</h4>
+                <strong style="color: var(--gold); font-size: 1.6rem; font-family: var(--ff-serif);">₹${(order.totalAmount || order.total || 0).toLocaleString('en-IN')}</strong>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(201,168,76,0.15); padding-top: 1.5rem;">
+              <a href="orders.html" class="btn-ghost" style="font-size: 0.75rem;">← Back to Orders</a>
+              <a href="track-order.html?order=${encodeURIComponent(orderNum)}" class="btn-primary" style="font-size: 0.75rem;"><span>Track Package</span></a>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<p class="ecom-alert ecom-alert-error">${err.message || 'Order not found.'}</p>`;
+      }
+
+      function escapeHtml(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

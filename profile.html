@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile | The Village Mill</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/ecommerce.css" />
+</head>
+<body>
+
+  <div id="cursor-glow"></div>
+  <div id="cursor-dot"></div>
+
+  <!-- NAVIGATION -->
+  <nav id="main-nav" class="scrolled">
+    <div class="nav-brand">
+      <a href="index.html" class="nav-logo-text">The Village Mill</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#our-oils">Our Oils</a></li>
+      <li><a href="orders.html">My Orders</a></li>
+      <li><a href="track-order.html">Track Order</a></li>
+      <li class="nav-account-slot"><a href="profile.html">👤 Account</a></li>
+      <li><a href="cart.html">🛒 Cart (<span class="nav-cart-badge-count">0</span>)</a></li>
+    </ul>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="ecom-page">
+    <div class="ecom-container">
+      
+      <div class="ecom-title-section">
+        <div class="ecom-eyebrow">Account Dashboard</div>
+        <h1 class="ecom-title">My Profile & Saved Addresses</h1>
+        <p class="ecom-subtitle">Manage your personal information and delivery preferences.</p>
+      </div>
+
+      <div id="profile-alert" class="ecom-alert hidden"></div>
+
+      <div class="cart-layout" style="grid-template-columns: 1fr 1fr;">
+        
+        <!-- PROFILE DETAILS -->
+        <div class="ecom-card">
+          <h2 class="ecom-card-title">My Profile</h2>
+          
+          <form id="profile-form">
+            <div class="ecom-form-group">
+              <label for="profile-name" class="ecom-label">Name</label>
+              <input type="text" id="profile-name" class="ecom-input" required />
+            </div>
+
+            <div class="ecom-form-group">
+              <label for="profile-email" class="ecom-label">Email (Read Only)</label>
+              <input type="email" id="profile-email" class="ecom-input" disabled style="opacity: 0.6; cursor: not-allowed;" />
+            </div>
+
+            <div class="ecom-form-group">
+              <label for="profile-phone" class="ecom-label">Phone</label>
+              <input type="tel" id="profile-phone" class="ecom-input" required />
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top: 1rem;">
+              <span>Save Changes</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ADDRESS MANAGEMENT -->
+        <div>
+          <div class="ecom-card" style="margin-bottom: 2rem;">
+            <h2 class="ecom-card-title">Saved Addresses</h2>
+            <div id="saved-addresses-list">
+              <!-- Dynamically loaded addresses -->
+            </div>
+          </div>
+
+          <div class="ecom-card">
+            <h2 class="ecom-card-title" style="font-size: 1.1rem;">Add New Address</h2>
+            
+            <form id="address-form">
+              <div class="ecom-form-row">
+                <div class="ecom-form-group">
+                  <label for="addr-name" class="ecom-label">Recipient Name</label>
+                  <input type="text" id="addr-name" class="ecom-input" placeholder="Name" required />
+                </div>
+                <div class="ecom-form-group">
+                  <label for="addr-phone" class="ecom-label">Phone Number</label>
+                  <input type="tel" id="addr-phone" class="ecom-input" placeholder="Phone" required />
+                </div>
+              </div>
+
+              <div class="ecom-form-group">
+                <label for="addr-address" class="ecom-label">Street Address</label>
+                <textarea id="addr-address" class="ecom-textarea" rows="2" placeholder="House / Flat No., Street, Area" required></textarea>
+              </div>
+
+              <div class="ecom-form-row">
+                <div class="ecom-form-group">
+                  <label for="addr-city" class="ecom-label">City</label>
+                  <input type="text" id="addr-city" class="ecom-input" placeholder="Coimbatore" required />
+                </div>
+                <div class="ecom-form-group">
+                  <label for="addr-state" class="ecom-label">State</label>
+                  <input type="text" id="addr-state" class="ecom-input" placeholder="Tamil Nadu" required />
+                </div>
+                <div class="ecom-form-group">
+                  <label for="addr-pincode" class="ecom-label">Pincode</label>
+                  <input type="text" id="addr-pincode" class="ecom-input" placeholder="641001" maxlength="10" required />
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary" style="margin-top: 0.5rem; width: 100%; justify-content: center;">
+                <span>Add Address</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <p class="footer-tagline">Tradition Pressed Into Purity</p>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 The Village Mill. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
