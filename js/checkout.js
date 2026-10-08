@@ -11,12 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedAddressesContainer = document.getElementById('saved-addresses-options');
   const summaryItemsContainer = document.getElementById('summary-items-list');
   const subtotalEl = document.getElementById('checkout-subtotal');
+  const deliveryEl = document.getElementById('checkout-delivery');
   const totalEl = document.getElementById('checkout-total');
   const payBtn = document.getElementById('btn-pay-now');
   const alertBox = document.getElementById('checkout-alert');
 
+  const DELIVERY_CHARGE = 45;
+
   let selectedAddress = null;
   let cartData = null;
+  let calculatedSubtotal = 0;
+  let calculatedTotal = 0;
   let isProcessingPayment = false;
 
   function showAlert(msg) {
@@ -29,6 +34,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function hideAlert() {
     if (alertBox) alertBox.classList.add('hidden');
+  }
+
+  // 0. PREFILL USER PROFILE DATA
+  function prefillUserData() {
+    const user = getUser();
+    if (!user) return;
+
+    const nameEl = document.getElementById('ship-name');
+    const phoneEl = document.getElementById('ship-phone');
+
+    if (nameEl && !nameEl.value && user.name) {
+      nameEl.value = user.name;
+    }
+    if (phoneEl && !phoneEl.value && user.phone) {
+      phoneEl.value = user.phone;
+    }
   }
 
   // 1. LOAD SAVED ADDRESSES
@@ -92,6 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
         subtotal = items.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
       }
 
+      calculatedSubtotal = subtotal;
+      calculatedTotal = subtotal + DELIVERY_CHARGE;
+
       if (summaryItemsContainer) {
         summaryItemsContainer.innerHTML = items.map(i => `
           <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.9rem;">
@@ -101,9 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
       }
 
-      if (subtotalEl) subtotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
-      if (totalEl) totalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
-      if (payBtn) payBtn.querySelector('.pay-amount-text').textContent = `Pay ₹${subtotal.toLocaleString('en-IN')}`;
+      if (subtotalEl) subtotalEl.textContent = `₹${calculatedSubtotal.toLocaleString('en-IN')}`;
+      if (deliveryEl) deliveryEl.textContent = `₹${DELIVERY_CHARGE}`;
+      if (totalEl) totalEl.textContent = `₹${calculatedTotal.toLocaleString('en-IN')}`;
+      if (payBtn) payBtn.querySelector('.pay-amount-text').textContent = `Pay ₹${calculatedTotal.toLocaleString('en-IN')}`;
     } catch (err) {
       showAlert(err.message || 'Failed to load order summary.');
     }
@@ -151,11 +176,15 @@ document.addEventListener('DOMContentLoaded', () => {
       payBtn.querySelector('.pay-amount-text').textContent = 'Processing Payment...';
 
       try {
-        // Step A: Request payment creation from backend
-        const paymentRes = await api.post('/api/payments/create', {});
+        // Step A: Request payment creation from backend with amount & receipt
+        const receiptId = "rcpt_" + Date.now();
+        const paymentRes = await api.post('/api/payments/create', {
+          amount: calculatedTotal,
+          receipt: receiptId
+        });
         const razorpayOrderId = paymentRes.razorpayOrderId || paymentRes.orderId || paymentRes.id;
         const razorpayKey = paymentRes.keyId || paymentRes.key || 'rzp_test_villagemill';
-        const amount = paymentRes.amount;
+        const amountInPaise = calculatedTotal * 100;
 
         if (!razorpayOrderId) {
           throw new Error('Could not initiate payment order with server.');
@@ -170,10 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = getUser() || {};
         const options = {
           key: razorpayKey,
-          amount: amount,
-          currency: paymentRes.currency || 'INR',
+          amount: amountInPaise,
+          currency: 'INR',
           name: 'The Village Mill',
-          description: 'Pure Cold Pressed Oils',
+          description: 'Pure Cold Pressed Oils Order',
           image: 'village-mill-logo.png',
           order_id: razorpayOrderId,
           prefill: {
@@ -252,6 +281,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  prefillUserData();
   loadAddresses();
   loadCheckoutCart();
 });
+

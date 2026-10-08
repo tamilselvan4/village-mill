@@ -9,6 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="css/ecommerce.css" />
+  <!-- Google Identity Services SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -47,20 +49,35 @@
         <div class="ecom-card">
           <div id="auth-alert" class="ecom-alert hidden"></div>
 
+          <!-- QUICK GOOGLE REGISTRATION -->
+          <button type="button" id="btn-custom-google" class="btn-google">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path fill="#ea4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.3 8.9 5 12 5z"/>
+              <path fill="#4285f4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+              <path fill="#fbbc05" d="M5.3 14.7c-.3-.8-.4-1.7-.4-2.7s.1-1.9.4-2.7L1.6 6.4C.6 8.4 0 10.1 0 12s.6 3.6 1.6 5.6l3.7-2.9z"/>
+              <path fill="#34a853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.3-6.7-5.3L1.6 16C3.5 19.8 7.4 23 12 23z"/>
+            </svg>
+            <span>Quick Register with Google</span>
+          </button>
+
+          <div class="auth-divider">
+            <span>OR REGISTER WITH EMAIL</span>
+          </div>
+
           <form id="register-form">
             <div class="ecom-form-group">
-              <label for="reg-name" class="ecom-label">Full Name</label>
-              <input type="text" id="reg-name" class="ecom-input" placeholder="Tamil Selvan" required autocomplete="name" />
+              <label for="reg-name" class="ecom-label">Full Name (Optional)</label>
+              <input type="text" id="reg-name" class="ecom-input" placeholder="Tamil Selvan" autocomplete="name" />
             </div>
 
             <div class="ecom-form-group">
-              <label for="reg-email" class="ecom-label">Email Address</label>
+              <label for="reg-email" class="ecom-label">Email Address *</label>
               <input type="email" id="reg-email" class="ecom-input" placeholder="user@example.com" required autocomplete="email" />
             </div>
 
             <div class="ecom-form-group">
-              <label for="reg-phone" class="ecom-label">Phone Number</label>
-              <input type="tel" id="reg-phone" class="ecom-input" placeholder="9876543210" required autocomplete="tel" />
+              <label for="reg-phone" class="ecom-label">Phone Number (Optional)</label>
+              <input type="tel" id="reg-phone" class="ecom-input" placeholder="9876543210" autocomplete="tel" />
             </div>
 
             <div class="ecom-form-row">
@@ -81,7 +98,7 @@
           </form>
 
           <div class="auth-footer-text">
-            Already have an account? <a href="login.html">Sign In</a>
+            Already have an account? <a href="login.html">Sign In with Password or OTP</a>
           </div>
         </div>
 

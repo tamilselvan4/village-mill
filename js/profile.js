@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update local user reference
         const currentUser = getUser() || {};
-        localStorage.setItem('vm_user', JSON.stringify({ ...currentUser, name: data.name, phone: data.phone }));
+        localStorage.setItem('vm_user', JSON.stringify({ ...currentUser, name: data.name, email: data.email, phone: data.phone }));
+        initHeaderNav();
       }
     } catch (err) {
       showAlert(err.message || 'Failed to load profile details.');
