@@ -13,7 +13,8 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const lerp = (a, b, t) => a + (b - a) * t;
 
 const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbz38iyHgLEr_J2jFVT_xfaAGj-xF61HMqmaMwHc4UOZiTIXwKkN5Uj2WDSb838_eIeyhg/exec';
-const WHATSAPP_CATALOG_URL = 'https://wa.me/c/917871247010';
+const WHATSAPP_ORDER_URL = 'https://wa.me/7871247010/?text=Hi';
+const WHATSAPP_CATALOG_URL = WHATSAPP_ORDER_URL;
 const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
 const isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
 const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -431,7 +432,7 @@ const shouldUseLiteEffects = isTouchDevice || isMobileViewport || shouldReduceMo
 })();
 
 /* ═══════════════════════════════════════════════════════════
-   11B. WHATSAPP CATALOG LINKS
+   11B. WHATSAPP ORDER LINKS
    ═══════════════════════════════════════════════════════════ */
 (function initWhatsAppLinks() {
   $$('.js-whatsapp-link').forEach(link => {
